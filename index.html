@@ -1,1291 +1,1611 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elegance Gamer - Runner Money</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        /* ============================================
-           RESET Y VARIABLES GLOBALES
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --primary-color: #ff6b00;
-            --secondary-color: #8b00ff;
-            --accent-color: #00ff00;
-            --bg-dark: #0a0a0a;
-            --bg-card: #1a1a2e;
-            --text-light: #ffffff;
-            --text-dim: #aaaaaa;
-            --danger: #ff0000;
-            --success: #00ff00;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            overflow-x: hidden;
-            user-select: none;
-        }
-
-        /* ============================================
-           PANTALLA DE CARGA
-           ============================================ */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .game-logo {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            text-shadow: 0 0 20px var(--primary-color);
-        }
-
-        .pumpkin {
-            display: inline-block;
-            color: var(--primary-color);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .loading-bar {
-            width: 300px;
-            height: 10px;
-            background: #333;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 20px auto;
-        }
-
-        .loading-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            animation: loading 2s ease-in-out forwards;
-        }
-
-        @keyframes loading {
-            to { width: 100%; }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* ============================================
-           CONTENEDOR PRINCIPAL
-           ============================================ */
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: relative;
-        }
-
-        /* ============================================
-           HEADER
-           ============================================ */
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: var(--bg-card);
-            border-bottom: 2px solid var(--primary-color);
-            box-shadow: 0 2px 10px rgba(255, 107, 0, 0.3);
-        }
-
-        .logo-small {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .balance-display {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .coin-icon {
-            font-size: 28px;
-        }
-
-        /* ============================================
-           ÁREA DE CONTENIDO
-           ============================================ */
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            padding-bottom: 140px;
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ============================================
-           TARJETAS DE MISIÓN
-           ============================================ */
-        .mission-card {
-            background: var(--bg-card);
-            border: 2px solid var(--primary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.2);
-        }
-
-        .mission-card h3 {
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-
-        .mission-card p {
-            margin-bottom: 10px;
-            color: var(--text-dim);
-        }
-
-        .small-text {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
-        .placeholder-text {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-dim);
-            font-style: italic;
-        }
-
-        /* ============================================
-           BOTONES
-           ============================================ */
-        .btn-primary {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.95);
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 15px;
-            background: #333;
-            border: 2px solid var(--text-dim);
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .btn-small {
-            padding: 8px 15px;
-            background: var(--primary-color);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        /* ============================================
-           SELECTOR DE PERSONAJES
-           ============================================ */
-        .character-selector {
-            background: var(--bg-card);
-            border: 2px solid var(--secondary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .characters {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .character-card {
-            flex: 1;
-            background: #2a2a3e;
-            border: 3px solid transparent;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .character-card.selected {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-        }
-
-        .character-preview {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 10px;
-            border-radius: 50%;
-            background: #444;
-        }
-
-        .boy-skull {
-            background: linear-gradient(135deg, #00ff00, #00aa00);
-        }
-
-        .girl-skull {
-            background: linear-gradient(135deg, #8b00ff, #5500aa);
-        }
-
-        /* ============================================
-           TIENDA
-           ============================================ */
-        .shop-section {
-            background: var(--bg-card);
-            border: 2px solid var(--primary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-
-        .shop-section h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-
-        .shop-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-        }
-
-        .shop-item {
-            background: #2a2a3e;
-            border: 2px solid #444;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .shop-item:active {
-            transform: scale(0.95);
-        }
-
-        .shop-item.unlocked {
-            border-color: var(--accent-color);
-        }
-
-        /* ============================================
-           MENÚ DEL JUEGO
-           ============================================ */
-        .game-menu {
-            text-align: center;
-        }
-
-        .avatar-display {
-            margin: 30px 0;
-        }
-
-        .avatar-large {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            border: 4px solid var(--primary-color);
-            box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
-        }
-
-        .graffiti-text {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px var(--accent-color);
-            font-family: 'Courier New', monospace;
-            letter-spacing: 3px;
-        }
-
-        .skills-section {
-            background: var(--bg-card);
-            border: 2px solid var(--secondary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .skills-inventory {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .skill-item {
-            background: #2a2a3e;
-            border: 2px solid #444;
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 14px;
-        }
-
-        .btn-start {
-            width: 100%;
-            padding: 25px;
-            background: linear-gradient(135deg, #ff0000, #ff6b00);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
-            margin-top: 20px;
-            animation: pulse 2s infinite;
-        }
-
-        /* ============================================
-           CANVAS DEL JUEGO
-           ============================================ */
-        .game-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 100;
-        }
-
-        /* ============================================
-           HUD DEL JUEGO
-           ============================================ */
-        .game-hud {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 101;
-        }
-
-        .hud-top {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
-
-        .hearts {
-            font-size: 32px;
-        }
-
-        .hud-coins {
-            font-size: 24px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
-            border-radius: 10px;
-        }
-
-        .hud-bottom {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .btn-pause {
-            font-size: 32px;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        /* ============================================
-           GAME OVER
-           ============================================ */
-        .game-over-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 102;
-        }
-
-        .game-over-screen h2 {
-            font-size: 48px;
-            color: var(--danger);
-            margin-bottom: 20px;
-        }
-
-        .game-over-screen p {
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-
-        .game-over-screen button {
-            width: 80%;
-            max-width: 300px;
-            margin: 10px 0;
-        }
-
-        /* ============================================
-           RANKING
-           ============================================ */
-        .player-stats {
-            background: var(--bg-card);
-            border: 2px solid var(--accent-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .big-number {
-            font-size: 36px;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin: 10px 0;
-        }
-
-        .leagues-list {
-            background: var(--bg-card);
-            border: 2px solid var(--primary-color);
-            border-radius: 15px;
-            padding: 20px;
-        }
-
-        .league-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #333;
-            transition: background 0.3s;
-        }
-
-        .league-item:last-child {
-            border-bottom: none;
-        }
-
-        .league-item.current {
-            background: rgba(255, 107, 0, 0.2);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .league-icon {
-            font-size: 32px;
-            margin-right: 15px;
-        }
-
-        .league-name {
-            flex: 1;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .league-req {
-            font-size: 16px;
-            color: var(--text-dim);
-        }
-
-        /* ============================================
-           BILLETERA
-           ============================================ */
-        .wallet-info {
-            background: var(--bg-card);
-            border: 2px solid var(--accent-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .wallet-address {
-            margin-top: 15px;
-        }
-
-        .wallet-address label {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--text-dim);
-        }
-
-        .wallet-address input {
-            width: 100%;
-            padding: 12px;
-            background: #2a2a3e;
-            border: 2px solid #444;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .withdrawal-policy {
-            background: var(--bg-card);
-            border: 2px solid var(--secondary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .policy-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--text-dim);
-        }
-
-        .withdrawal-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .btn-withdraw {
-            padding: 20px;
-            background: linear-gradient(135deg, var(--success), #00aa00);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
-        }
-
-        /* ============================================
-           NAVEGACIÓN INFERIOR
-           ============================================ */
-        .bottom-nav {
-            position: fixed;
-            bottom: 80px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background: var(--bg-card);
-            border-top: 2px solid var(--primary-color);
-            padding: 10px 0;
-            z-index: 50;
-        }
-
-        .nav-btn {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            transition: all 0.3s;
-            padding: 10px 5px;
-        }
-
-        .nav-btn.active {
-            color: var(--primary-color);
-            transform: translateY(-5px);
-        }
-
-        .nav-btn.central {
-            transform: translateY(-15px);
-        }
-
-        .nav-btn.central.active {
-            transform: translateY(-20px);
-        }
-
-        .nav-icon {
-            font-size: 24px;
-        }
-
-        .nav-text {
-            font-size: 12px;
-        }
-
-        /* ============================================
-           BANNER DE ANUNCIOS
-           ============================================ */
-        .banner-ad-space {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background: #1a1a1a;
-            border-top: 2px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 49;
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media (max-width: 480px) {
-            .game-logo {
-                font-size: 36px;
-            }
-            
-            .characters {
-                flex-direction: column;
-            }
-            
-            .skills-inventory {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Elegance Gamer - Runner Money</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+    --primary: #ff6b00;
+    --secondary: #8b00ff;
+    --accent: #00ff00;
+    --bg-dark: #0a0a0a;
+    --bg-card: #1a1a2e;
+    --text: #ffffff;
+    --dim: #aaaaaa;
+    --danger: #ff0000;
+    --success: #00ff00;
+}
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text); overflow-x: hidden; user-select: none; }
+
+/* ============================================
+   PANTALLA DE CARGA URBANA 3D
+   ============================================ */
+.loading-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a1a2e 100%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; overflow: hidden;
+    perspective: 1000px;
+}
+.loading-screen::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255,107,0,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139,0,255,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0,255,0,0.08) 0%, transparent 50%);
+    animation: bgPulse 4s ease-in-out infinite;
+}
+@keyframes bgPulse {
+    0%,100% { opacity: 0.6; } 50% { opacity: 1; }
+}
+.loading-content {
+    text-align: center; z-index: 10; position: relative;
+    transform-style: preserve-3d;
+}
+.game-logo {
+    font-size: 52px; font-weight: 900; margin-bottom: 20px;
+    text-shadow: 0 0 30px var(--primary), 0 0 60px var(--secondary);
+    letter-spacing: 3px;
+    animation: logoFloat 3s ease-in-out infinite;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+}
+.pumpkin {
+    display: inline-block; color: var(--primary);
+    animation: pumpkinSpin 2s ease-in-out infinite;
+    text-shadow: 0 0 20px var(--primary);
+}
+@keyframes pumpkinSpin {
+    0%,100% { transform: rotateY(0deg) scale(1); }
+    50% { transform: rotateY(180deg) scale(1.2); }
+}
+@keyframes logoFloat {
+    0%,100% { transform: translateY(0) rotateX(0deg); }
+    50% { transform: translateY(-10px) rotateX(5deg); }
+}
+
+/* PERSONAJES 3D EN PANTALLA DE CARGA */
+.characters-3d {
+    display: flex; justify-content: center; gap: 40px;
+    margin: 30px 0; perspective: 800px;
+}
+.char-3d {
+    width: 100px; height: 140px; position: relative;
+    transform-style: preserve-3d;
+    animation: charBounce 2s ease-in-out infinite;
+}
+.char-3d.boy { animation-delay: 0s; }
+.char-3d.girl { animation-delay: 1s; }
+@keyframes charBounce {
+    0%,100% { transform: translateY(0) rotateY(0deg); }
+    25% { transform: translateY(-30px) rotateY(15deg); }
+    50% { transform: translateY(0) rotateY(0deg); }
+    75% { transform: translateY(-20px) rotateY(-15deg); }
+}
+.char-head {
+    width: 60px; height: 60px; border-radius: 50%;
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    box-shadow: 0 0 20px currentColor;
+}
+.char-3d.boy .char-head {
+    background: radial-gradient(circle at 30% 30%, #444, #111);
+    color: #00ff00;
+}
+.char-3d.girl .char-head {
+    background: radial-gradient(circle at 30% 30%, #333, #000);
+    color: #8b00ff;
+}
+.char-eyes {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px;
+}
+.char-eye {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    animation: eyeGlow 1.5s ease-in-out infinite;
+}
+@keyframes eyeGlow {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
+}
+.char-body {
+    width: 50px; height: 60px; position: absolute;
+    top: 55px; left: 50%; transform: translateX(-50%);
+    border-radius: 10px;
+}
+.char-3d.boy .char-body {
+    background: linear-gradient(180deg, #111 0%, #222 100%);
+    border: 2px solid #333;
+}
+.char-3d.girl .char-body {
+    background: linear-gradient(180deg, #222 0%, #111 100%);
+    border: 2px solid #444;
+}
+.char-legs {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px;
+}
+.char-leg {
+    width: 15px; height: 30px; background: #222;
+    border-radius: 5px;
+    animation: legRun 0.5s ease-in-out infinite;
+}
+.char-leg:nth-child(2) { animation-delay: 0.25s; }
+@keyframes legRun {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* MONEDAS SALTANDO */
+.coins-rain {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 5;
+}
+.coin-3d {
+    position: absolute; width: 30px; height: 30px;
+    background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
+    border-radius: 50%;
+    box-shadow: 0 0 15px #ffd700, inset -3px -3px 8px rgba(0,0,0,0.3);
+    animation: coinFall 4s linear infinite;
+}
+.coin-3d::after {
+    content: '$'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    color: #8b4513; font-weight: bold; font-size: 16px;
+}
+@keyframes coinFall {
+    0% { transform: translateY(-50px) rotateY(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(100vh) rotateY(720deg); opacity: 0; }
+}
+
+/* BARRA DE CARGA */
+.loading-bar {
+    width: 280px; height: 12px; background: #222;
+    border-radius: 6px; overflow: hidden; margin: 20px auto;
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 20px rgba(255,107,0,0.5);
+}
+.loading-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    background-size: 200% 100%;
+    animation: loading 2.5s ease-in-out forwards, shimmer 1.5s linear infinite;
+}
+@keyframes loading { to { width: 100%; } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* PANTALLA START (después de cargar) */
+.start-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a1a2e 100%);
+    display: none; align-items: center; justify-content: center;
+    z-index: 9998; flex-direction: column;
+}
+.start-screen.active { display: flex; }
+.start-btn {
+    padding: 25px 60px; font-size: 28px; font-weight: 900;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none; border-radius: 20px; color: white;
+    cursor: pointer; letter-spacing: 3px;
+    box-shadow: 0 10px 40px rgba(255,107,0,0.6), 0 0 60px rgba(139,0,255,0.4);
+    animation: startPulse 2s ease-in-out infinite;
+    text-transform: uppercase;
+}
+@keyframes startPulse {
+    0%,100% { transform: scale(1); box-shadow: 0 10px 40px rgba(255,107,0,0.6); }
+    50% { transform: scale(1.05); box-shadow: 0 15px 60px rgba(255,107,0,0.9); }
+}
+.start-btn:active { transform: scale(0.95); }
+
+.hidden { display: none !important; }
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.main-container {
+    display: flex; flex-direction: column; height: 100vh; position: relative;
+}
+.game-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px; background: var(--bg-card);
+    border-bottom: 2px solid var(--primary);
+    box-shadow: 0 2px 10px rgba(255,107,0,0.3);
+}
+.logo-small { font-size: 18px; font-weight: 900; }
+.balance-display {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 22px; font-weight: bold; color: var(--accent);
+}
+.coin-icon { font-size: 26px; }
+
+.content-area {
+    flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 140px;
+}
+.tab-content { display: none; animation: fadeIn 0.3s; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.mission-card {
+    background: var(--bg-card); border: 2px solid var(--primary);
+    border-radius: 15px; padding: 20px; margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(255,107,0,0.2);
+}
+.mission-card h3 { margin-bottom: 10px; color: var(--primary); }
+.mission-card p { margin-bottom: 10px; color: var(--dim); }
+.small-text { font-size: 12px; color: var(--dim); }
+.placeholder-text { text-align: center; padding: 20px; color: var(--dim); font-style: italic; }
+
+.btn-primary {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none; border-radius: 10px; color: white;
+    font-size: 16px; font-weight: bold; cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 15px rgba(255,107,0,0.4);
+}
+.btn-primary:active { transform: scale(0.95); }
+.btn-secondary {
+    width: 100%; padding: 15px; background: #333;
+    border: 2px solid var(--dim); border-radius: 10px;
+    color: white; font-size: 16px; cursor: pointer; margin-top: 10px;
+}
+.btn-small {
+    padding: 8px 15px; background: var(--primary);
+    border: none; border-radius: 5px; color: white;
+    font-size: 14px; cursor: pointer;
+}
+
+.character-selector {
+    background: var(--bg-card); border: 2px solid var(--secondary);
+    border-radius: 15px; padding: 20px; margin-bottom: 20px;
+}
+.characters { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
+.character-card {
+    flex: 1; background: #2a2a3e; border: 3px solid transparent;
+    border-radius: 10px; padding: 15px; text-align: center;
+    cursor: pointer; transition: all 0.3s;
+}
+.character-card.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(0,255,0,0.5);
+}
+.character-preview {
+    width: 80px; height: 80px; margin: 0 auto 10px;
+    border-radius: 50%;
+}
+.boy-skull { background: linear-gradient(135deg, #00ff00, #00aa00); }
+.girl-skull { background: linear-gradient(135deg, #8b00ff, #5500aa); }
+
+.shop-section {
+    background: var(--bg-card); border: 2px solid var(--primary);
+    border-radius: 15px; padding: 20px; margin-bottom: 15px;
+}
+.shop-section h3 { margin-bottom: 15px; color: var(--primary); }
+.shop-items {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+.shop-item {
+    background: #2a2a3e; border: 2px solid #444;
+    border-radius: 10px; padding: 10px; text-align: center;
+    cursor: pointer; font-size: 12px; color: var(--dim);
+}
+.shop-item.unlocked { border-color: var(--accent); color: var(--accent); }
+
+.game-menu { text-align: center; }
+.avatar-display { margin: 30px 0; }
+.avatar-large {
+    width: 150px; height: 150px; margin: 0 auto 20px;
+    border-radius: 50%; border: 4px solid var(--primary);
+    box-shadow: 0 0 30px rgba(255,107,0,0.6);
+}
+.graffiti-text {
+    font-size: 28px; font-weight: bold; color: var(--accent);
+    text-shadow: 0 0 10px var(--accent);
+    font-family: 'Courier New', monospace; letter-spacing: 3px;
+}
+.skills-section {
+    background: var(--bg-card); border: 2px solid var(--secondary);
+    border-radius: 15px; padding: 20px; margin: 20px 0;
+}
+.skills-inventory {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px; margin-top: 15px;
+}
+.skill-item {
+    background: #2a2a3e; border: 2px solid #444;
+    border-radius: 10px; padding: 10px; font-size: 14px;
+}
+.btn-start {
+    width: 100%; padding: 25px;
+    background: linear-gradient(135deg, #ff0000, #ff6b00);
+    border: none; border-radius: 15px; color: white;
+    font-size: 24px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255,0,0,0.5);
+    margin-top: 20px; animation: startPulse 2s infinite;
+}
+
+.game-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 100;
+}
+.game-hud {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 101;
+}
+.hud-top { display: flex; justify-content: space-between; padding: 20px; }
+.hearts { font-size: 32px; }
+.hud-coins {
+    font-size: 24px; font-weight: bold;
+    background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 10px;
+}
+.hud-bottom { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); }
+.btn-pause {
+    font-size: 32px; background: rgba(0,0,0,0.7);
+    border: none; border-radius: 50%; width: 60px; height: 60px;
+    pointer-events: auto; cursor: pointer;
+}
+.game-over-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 102;
+}
+.game-over-screen h2 { font-size: 48px; color: var(--danger); margin-bottom: 20px; }
+.game-over-screen p { font-size: 24px; margin-bottom: 30px; }
+.game-over-screen button { width: 80%; max-width: 300px; margin: 10px 0; }
+
+.player-stats {
+    background: var(--bg-card); border: 2px solid var(--accent);
+    border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center;
+}
+.big-number { font-size: 36px; font-weight: bold; color: var(--accent); margin: 10px 0; }
+.leagues-list {
+    background: var(--bg-card); border: 2px solid var(--primary);
+    border-radius: 15px; padding: 20px;
+}
+.league-item {
+    display: flex; align-items: center; padding: 15px;
+    border-bottom: 1px solid #333; transition: background 0.3s;
+}
+.league-item:last-child { border-bottom: none; }
+.league-item.current {
+    background: rgba(255,107,0,0.2);
+    border-left: 4px solid var(--primary);
+}
+.league-icon { font-size: 32px; margin-right: 15px; }
+.league-name { flex: 1; font-size: 18px; font-weight: bold; }
+.league-req { font-size: 16px; color: var(--dim); }
+
+.wallet-info {
+    background: var(--bg-card); border: 2px solid var(--accent);
+    border-radius: 15px; padding: 20px; margin-bottom: 20px;
+    position: relative;
+}
+.wallet-address { margin-top: 15px; }
+.wallet-address label { display: block; margin-bottom: 10px; color: var(--dim); }
+.wallet-address input {
+    width: 100%; padding: 12px; background: #2a2a3e;
+    border: 2px solid #444; border-radius: 8px; color: white;
+    font-size: 14px; margin-bottom: 10px;
+}
+
+/* TUERCA DE IDIOMAS */
+.settings-gear {
+    position: absolute; top: 15px; right: 15px;
+    width: 40px; height: 40px; background: #2a2a3e;
+    border: 2px solid var(--primary); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; cursor: pointer;
+    transition: transform 0.3s;
+}
+.settings-gear:hover { transform: rotate(90deg); }
+.lang-menu {
+    position: absolute; top: 60px; right: 15px;
+    background: var(--bg-card); border: 2px solid var(--primary);
+    border-radius: 10px; padding: 10px; display: none;
+    z-index: 200; min-width: 180px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+.lang-menu.active { display: block; }
+.lang-option {
+    padding: 10px; cursor: pointer; border-radius: 5px;
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.2s;
+}
+.lang-option:hover { background: #2a2a3e; }
+.lang-option.selected { background: var(--primary); color: white; }
+
+.withdrawal-policy {
+    background: var(--bg-card); border: 2px solid var(--secondary);
+    border-radius: 15px; padding: 20px; margin-bottom: 20px;
+}
+.policy-text { font-size: 14px; line-height: 1.6; color: var(--dim); }
+.withdrawal-buttons {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
+}
+.btn-withdraw {
+    padding: 20px;
+    background: linear-gradient(135deg, var(--success), #00aa00);
+    border: none; border-radius: 10px; color: white;
+    font-size: 18px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,255,0,0.3);
+}
+
+.bottom-nav {
+    position: fixed; bottom: 80px; left: 0; width: 100%;
+    display: flex; justify-content: space-around;
+    background: var(--bg-card); border-top: 2px solid var(--primary);
+    padding: 10px 0; z-index: 50;
+}
+.nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 5px; background: none; border: none; color: var(--dim);
+    cursor: pointer; transition: all 0.3s; padding: 10px 5px;
+}
+.nav-btn.active { color: var(--primary); transform: translateY(-5px); }
+.nav-btn.central { transform: translateY(-15px); }
+.nav-btn.central.active { transform: translateY(-20px); }
+.nav-icon { font-size: 24px; }
+.nav-text { font-size: 12px; }
+
+.banner-ad-space {
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+    background: #1a1a1a; border-top: 2px solid #333;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 49;
+}
+
+@media (max-width: 480px) {
+    .game-logo { font-size: 36px; }
+    .characters { flex-direction: column; }
+    .skills-inventory { grid-template-columns: repeat(2, 1fr); }
+    .char-3d { width: 80px; height: 110px; }
+    .char-head { width: 50px; height: 50px; }
+    .char-body { width: 40px; height: 50px; top: 45px; }
+}
+</style>
 </head>
 <body>
-    <!-- PANTALLA DE CARGA -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-content">
-            <h1 class="game-logo">RUNNER <span class="pumpkin">O</span>MONEY</h1>
-            <div class="loading-bar">
-                <div class="loading-fill"></div>
+
+<!-- PANTALLA DE CARGA URBANA 3D -->
+<div id="loadingScreen" class="loading-screen">
+    <div class="coins-rain" id="coinsRain"></div>
+    <div class="loading-content">
+        <h1 class="game-logo">RUNNER <span class="pumpkin">O</span>MONEY</h1>
+        <div class="characters-3d">
+            <div class="char-3d boy">
+                <div class="char-head">
+                    <div class="char-eyes">
+                        <div class="char-eye"></div>
+                        <div class="char-eye"></div>
+                    </div>
+                </div>
+                <div class="char-body"></div>
+                <div class="char-legs">
+                    <div class="char-leg"></div>
+                    <div class="char-leg"></div>
+                </div>
             </div>
-            <p>Cargando Elegance Gamer...</p>
-        </div>
-    </div>
-
-    <!-- CONTENEDOR PRINCIPAL -->
-    <div id="mainContainer" class="main-container hidden">
-        <!-- HEADER CON SALDO -->
-        <header class="game-header">
-            <div class="logo-small">RUNNER <span class="pumpkin">O</span>MONEY</div>
-            <div class="balance-display">
-                <span id="coinBalance">0</span>
-                <span class="coin-icon">🪙</span>
+            <div class="char-3d girl">
+                <div class="char-head">
+                    <div class="char-eyes">
+                        <div class="char-eye"></div>
+                        <div class="char-eye"></div>
+                    </div>
+                </div>
+                <div class="char-body"></div>
+                <div class="char-legs">
+                    <div class="char-leg"></div>
+                    <div class="char-leg"></div>
+                </div>
             </div>
-        </header>
-
-        <!-- ÁREA DE CONTENIDO DE LAS PESTAÑAS -->
-        <main class="content-area">
-            <!-- PESTAÑA 1: MISIONES -->
-            <section id="missionsTab" class="tab-content active">
-                <h2>🎯 Misiones y Tareas</h2>
-                
-                <div class="mission-card">
-                    <h3>📅 Recompensa Diaria</h3>
-                    <p>Día <span id="currentDay">1</span>: <span id="dailyReward">1,000</span> monedas</p>
-                    <button id="claimDailyBtn" class="btn-primary">Reclamar (Ver Video)</button>
-                </div>
-
-                <div class="mission-card">
-                    <h3>🎬 Maratón de Anuncios</h3>
-                    <p>Ve hasta 20 videos diarios</p>
-                    <p>Recompensa: 500 monedas por video</p>
-                    <button id="marathonBtn" class="btn-primary">Ver Video Ahora</button>
-                    <p class="small-text">Videos vistos hoy: <span id="videosWatched">0</span>/20</p>
-                </div>
-
-                <div class="mission-card">
-                    <h3>👥 Invitar Amigos</h3>
-                    <p>Gana 5,000 monedas por cada amigo</p>
-                    <button id="inviteBtn" class="btn-primary">Copiar Link de Referido</button>
-                </div>
-
-                <div class="mission-card">
-                    <h3>🔗 Tareas Externas</h3>
-                    <div id="offerwallContainer">
-                        <p class="placeholder-text">Contenedor para Monlix Offerwall</p>
-                    </div>
-                </div>
-
-                <div class="mission-card">
-                    <h3>📱 Tareas de Telegram</h3>
-                    <div id="telegramTasksContainer">
-                        <p class="placeholder-text">Contenedor para Tareas Nativas de Telegram</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- PESTAÑA 2: VESTIDOR -->
-            <section id="wardrobeTab" class="tab-content">
-                <h2>👗 Vestidor y Tienda</h2>
-                
-                <div class="character-selector">
-                    <h3>Selecciona Personaje</h3>
-                    <div class="characters">
-                        <div class="character-card selected" data-character="boy">
-                            <div class="character-preview boy-skull"></div>
-                            <p>Chico Calavera</p>
-                        </div>
-                        <div class="character-card" data-character="girl">
-                            <div class="character-preview girl-skull"></div>
-                            <p>Chica Calavera</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="shop-section">
-                    <h3>👟 Calzado (10 videos)</h3>
-                    <div class="shop-items" id="shoesShop"></div>
-                </div>
-
-                <div class="shop-section">
-                    <h3>🧢 Gorras/Cascos (20 videos)</h3>
-                    <div class="shop-items" id="hatsShop"></div>
-                </div>
-
-                <div class="shop-section">
-                    <h3>👕 Camisetas (30 videos)</h3>
-                    <div class="shop-items" id="shirtsShop"></div>
-                </div>
-
-                <div class="shop-section">
-                    <h3>👖 Pantalones/Faldas (40 videos)</h3>
-                    <div class="shop-items" id="pantsShop"></div>
-                </div>
-
-                <div class="shop-section">
-                    <h3>🎭 Trajes Completos (50 videos)</h3>
-                    <div class="shop-items" id="fullOutfitsShop"></div>
-                </div>
-
-                <div class="shop-section">
-                    <h3>🛹 Tablas/Patinetas (50 videos)</h3>
-                    <div class="shop-items" id="boardsShop"></div>
-                </div>
-            </section>
-
-            <!-- PESTAÑA 3: JUEGO (CENTRAL) -->
-            <section id="gameTab" class="tab-content">
-                <div class="game-menu">
-                    <div class="avatar-display">
-                        <div id="selectedAvatar" class="avatar-large boy-skull"></div>
-                        <p class="graffiti-text">EleganceCoin</p>
-                    </div>
-
-                    <div class="skills-section">
-                        <h3>🚀 Habilidades Pre-Carrera</h3>
-                        <p>Ver 1 video = 3 habilidades consumibles</p>
-                        <button id="loadSkillsBtn" class="btn-primary">Cargar Habilidades</button>
-                        <div class="skills-inventory">
-                            <div class="skill-item" data-skill="jetpack">🚀 Jetpack: <span>0</span></div>
-                            <div class="skill-item" data-skill="shield">🛹 Tabla: <span>0</span></div>
-                            <div class="skill-item" data-skill="magnet">🧲 Imán: <span>0</span></div>
-                            <div class="skill-item" data-skill="jump">⬆️ Super Salto: <span>0</span></div>
-                            <div class="skill-item" data-skill="speed">⚡ Velocidad: <span>0</span></div>
-                        </div>
-                    </div>
-
-                    <button id="startGameBtn" class="btn-start">¡CORRER!</button>
-                </div>
-
-                <!-- CANVAS DEL JUEGO -->
-                <canvas id="gameCanvas" class="game-canvas hidden"></canvas>
-                
-                <!-- HUD DEL JUEGO -->
-                <div id="gameHUD" class="game-hud hidden">
-                    <div class="hud-top">
-                        <div class="hearts">
-                            <span class="heart">❤️</span>
-                            <span class="heart">❤️</span>
-                            <span class="heart">❤️</span>
-                        </div>
-                        <div class="hud-coins">
-                            <span id="hudCoins">0</span> 🪙
-                        </div>
-                    </div>
-                    <div class="hud-bottom">
-                        <button id="pauseBtn" class="btn-pause">⏸️</button>
-                    </div>
-                </div>
-
-                <!-- PANTALLA GAME OVER -->
-                <div id="gameOverScreen" class="game-over-screen hidden">
-                    <h2>💀 Game Over</h2>
-                    <p>Monedas ganadas: <span id="finalCoins">0</span></p>
-                    <button id="reviveBtn" class="btn-primary">Revivir (Ver Video)</button>
-                    <button id="doubleBtn" class="btn-primary">Multiplicar x2 (Ver Video)</button>
-                    <button id="menuBtn" class="btn-secondary">Volver al Menú</button>
-                </div>
-            </section>
-
-            <!-- PESTAÑA 4: RANKING -->
-            <section id="rankingTab" class="tab-content">
-                <h2>🏆 Tabla de Clasificación</h2>
-                
-                <div class="player-stats">
-                    <h3>Tu Saldo Total</h3>
-                    <p class="big-number"><span id="totalBalance">0</span> monedas</p>
-                    <p>Liga Actual: <span id="currentLeague">Bronce</span></p>
-                </div>
-
-                <div class="leagues-list">
-                    <h3>Ligas</h3>
-                    <div class="league-item" data-league="bronze">
-                        <span class="league-icon">🥉</span>
-                        <span class="league-name">Bronce</span>
-                        <span class="league-req">500K</span>
-                    </div>
-                    <div class="league-item" data-league="silver">
-                        <span class="league-icon">🥈</span>
-                        <span class="league-name">Plata</span>
-                        <span class="league-req">1M</span>
-                    </div>
-                    <div class="league-item" data-league="gold">
-                        <span class="league-icon">🥇</span>
-                        <span class="league-name">Oro</span>
-                        <span class="league-req">5M</span>
-                    </div>
-                    <div class="league-item" data-league="diamond">
-                        <span class="league-icon">💎</span>
-                        <span class="league-name">Diamante</span>
-                        <span class="league-req">10M</span>
-                    </div>
-                    <div class="league-item" data-league="emerald">
-                        <span class="league-icon">💚</span>
-                        <span class="league-name">Esmeralda</span>
-                        <span class="league-req">20M</span>
-                    </div>
-                    <div class="league-item" data-league="ruby">
-                        <span class="league-icon">❤️</span>
-                        <span class="league-name">Rubí</span>
-                        <span class="league-req">35M</span>
-                    </div>
-                    <div class="league-item" data-league="sapphire">
-                        <span class="league-icon">💙</span>
-                        <span class="league-name">Zafiro</span>
-                        <span class="league-req">50M</span>
-                    </div>
-                    <div class="league-item" data-league="mythic">
-                        <span class="league-icon">🔮</span>
-                        <span class="league-name">Mítico</span>
-                        <span class="league-req">85M</span>
-                    </div>
-                    <div class="league-item" data-league="immortal">
-                        <span class="league-icon">👻</span>
-                        <span class="league-name">Inmortal</span>
-                        <span class="league-req">95M</span>
-                    </div>
-                    <div class="league-item" data-league="legendary">
-                        <span class="league-icon">🌟</span>
-                        <span class="league-name">Legendario</span>
-                        <span class="league-req">100M</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- PESTAÑA 5: BILLETERA -->
-            <section id="walletTab" class="tab-content">
-                <h2>💰 Billetera y Retiros</h2>
-                
-                <div class="wallet-info">
-                    <h3>Tu Billetera</h3>
-                    <div class="wallet-address">
-                        <label>Wallet Vinculada:</label>
-                        <input type="text" id="walletAddress" placeholder="Ingresa tu wallet USDT/TON">
-                        <button id="saveWalletBtn" class="btn-small">Guardar</button>
-                    </div>
-                </div>
-
-                <div class="withdrawal-policy">
-                    <h3>📋 Política de Retiros</h3>
-                    <p class="policy-text">
-                        Cada 40 días se realiza la evaluación de puntos acumulados en tu balance de EleganceCoin. 
-                        El reparto de dinero real en USDT se enviará directamente a tu Billetera de Telegram vinculada, 
-                        proporcional a tu actividad y puntuación. Entre más juegues y subas en la tabla, mayor será 
-                        tu recompensa en dólares reales. Sin inversiones, solo juega y gana.
-                    </p>
-                </div>
-
-                <div class="withdrawal-buttons">
-                    <h3>Retirar Fondos</h3>
-                    <button class="btn-withdraw" data-amount="1">$1.00 USD</button>
-                    <button class="btn-withdraw" data-amount="5">$5.00 USD</button>
-                    <button class="btn-withdraw" data-amount="10">$10.00 USD</button>
-                    <button class="btn-withdraw" data-amount="20">$20.00 USD</button>
-                </div>
-            </section>
-        </main>
-
-        <!-- BARRA DE NAVEGACIÓN INFERIOR -->
-        <nav class="bottom-nav">
-            <button class="nav-btn active" data-tab="missionsTab">
-                <span class="nav-icon">🎯</span>
-                <span class="nav-text">Misiones</span>
-            </button>
-            <button class="nav-btn" data-tab="wardrobeTab">
-                <span class="nav-icon">👗</span>
-                <span class="nav-text">Vestidor</span>
-            </button>
-            <button class="nav-btn central" data-tab="gameTab">
-                <span class="nav-icon">🎮</span>
-                <span class="nav-text">Jugar</span>
-            </button>
-            <button class="nav-btn" data-tab="rankingTab">
-                <span class="nav-icon">🏆</span>
-                <span class="nav-text">Ranking</span>
-            </button>
-            <button class="nav-btn" data-tab="walletTab">
-                <span class="nav-icon">💰</span>
-                <span class="nav-text">Wallet</span>
-            </button>
-        </nav>
-
-        <!-- ESPACIO PARA BANNER DE ANUNCIOS -->
-        <div id="bannerAdSpace" class="banner-ad-space">
-            <p class="placeholder-text">Espacio para Banner Ad (Adsgram/Monlix)</p>
         </div>
+        <div class="loading-bar">
+            <div class="loading-fill"></div>
+        </div>
+        <p style="color: var(--dim); margin-top: 10px;">Cargando Elegance Gamer...</p>
     </div>
+</div>
 
-    <script>
-        // ============================================
-        // SISTEMA DE AUDIO - MÚSICA Y EFECTOS
-        // ============================================
-        class AudioManager {
-            constructor() {
-                this.audioContext = null;
-                this.backgroundMusic = null;
-                this.isMusicPlaying = false;
-                this.initAudioContext();
-            }
+<!-- PANTALLA START -->
+<div id="startScreen" class="start-screen">
+    <h1 class="game-logo" style="margin-bottom: 40px;">RUNNER <span class="pumpkin">O</span>MONEY</h1>
+    <button class="start-btn" id="startAppBtn">EMPEZAR</button>
+</div>
 
-            initAudioContext() {
-                // Crear contexto de audio al primer click
-                document.addEventListener('click', () => {
-                    if (!this.audioContext) {
-                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    }
-                }, { once: true });
-            }
+<!-- CONTENEDOR PRINCIPAL -->
+<div id="mainContainer" class="main-container hidden">
+    <header class="game-header">
+        <div class="logo-small">RUNNER <span class="pumpkin">O</span>MONEY</div>
+        <div class="balance-display">
+            <span id="coinBalance">0</span>
+            <span class="coin-icon">🪙</span>
+        </div>
+    </header>
 
-            // Generar música de fondo temática de Halloween
-            playBackgroundMusic() {
-                if (!this.audioContext || this.isMusicPlaying) return;
+    <main class="content-area">
+        <!-- PESTAÑA 1: MISIONES -->
+        <section id="missionsTab" class="tab-content active">
+            <h2 data-i18n="missions">🎯 Misiones y Tareas</h2>
+            <div class="mission-card">
+                <h3 data-i18n="dailyReward">📅 Recompensa Diaria</h3>
+                <p><span data-i18n="day">Día</span> <span id="currentDay">1</span>: <span id="dailyReward">1,000</span> <span data-i18n="coins">monedas</span></p>
+                <button id="claimDailyBtn" class="btn-primary" data-i18n="claimVideo">Reclamar (Ver Video)</button>
+            </div>
+            <div class="mission-card">
+                <h3 data-i18n="marathon">🎬 Maratón de Anuncios</h3>
+                <p data-i18n="marathonDesc">Ve hasta 20 videos diarios</p>
+                <p><span data-i18n="reward">Recompensa</span>: 500 <span data-i18n="coins">monedas</span></p>
+                <button id="marathonBtn" class="btn-primary" data-i18n="watchNow">Ver Video Ahora</button>
+                <p class="small-text"><span data-i18n="videosToday">Videos vistos hoy</span>: <span id="videosWatched">0</span>/20</p>
+            </div>
+            <div class="mission-card">
+                <h3 data-i18n="invite">👥 Invitar Amigos</h3>
+                <p data-i18n="inviteDesc">Gana 5,000 monedas por cada amigo</p>
+                <button id="inviteBtn" class="btn-primary" data-i18n="copyLink">Copiar Link de Referido</button>
+            </div>
+            <div class="mission-card">
+                <h3 data-i18n="externalTasks">🔗 Tareas Externas</h3>
+                <div id="offerwallContainer"><p class="placeholder-text">Monlix Offerwall</p></div>
+            </div>
+            <div class="mission-card">
+                <h3 data-i18n="telegramTasks">📱 Tareas de Telegram</h3>
+                <div id="telegramTasksContainer"><p class="placeholder-text">Telegram Tasks</p></div>
+            </div>
+        </section>
 
-                this.isMusicPlaying = true;
-                this.backgroundMusic = this.createHalloweenMusic();
-            }
+        <!-- PESTAÑA 2: VESTIDOR -->
+        <section id="wardrobeTab" class="tab-content">
+            <h2 data-i18n="wardrobe">👗 Vestidor y Tienda</h2>
+            <div class="character-selector">
+                <h3 data-i18n="selectChar">Selecciona Personaje</h3>
+                <div class="characters">
+                    <div class="character-card selected" data-character="boy">
+                        <div class="character-preview boy-skull"></div>
+                        <p data-i18n="boySkull">Chico Calavera</p>
+                    </div>
+                    <div class="character-card" data-character="girl">
+                        <div class="character-preview girl-skull"></div>
+                        <p data-i18n="girlSkull">Chica Calavera</p>
+                    </div>
+                </div>
+            </div>
+            <div class="shop-section">
+                <h3 data-i18n="shoes">👟 Calzado (10 videos)</h3>
+                <div class="shop-items" id="shoesShop"></div>
+            </div>
+            <div class="shop-section">
+                <h3 data-i18n="hats">🧢 Gorras (20 videos)</h3>
+                <div class="shop-items" id="hatsShop"></div>
+            </div>
+            <div class="shop-section">
+                <h3 data-i18n="shirts">👕 Camisetas (30 videos)</h3>
+                <div class="shop-items" id="shirtsShop"></div>
+            </div>
+            <div class="shop-section">
+                <h3 data-i18n="pants">👖 Pantalones (40 videos)</h3>
+                <div class="shop-items" id="pantsShop"></div>
+            </div>
+            <div class="shop-section">
+                <h3 data-i18n="outfits">🎭 Trajes (50 videos)</h3>
+                <div class="shop-items" id="fullOutfitsShop"></div>
+            </div>
+            <div class="shop-section">
+                <h3 data-i18n="boards">🛹 Tablas (50 videos)</h3>
+                <div class="shop-items" id="boardsShop"></div>
+            </div>
+        </section>
 
-            createHalloweenMusic() {
-                const ctx = this.audioContext;
-                const now = ctx.currentTime;
+        <!-- PESTAÑA 3: JUEGO -->
+        <section id="gameTab" class="tab-content">
+            <div class="game-menu">
+                <div class="avatar-display">
+                    <div id="selectedAvatar" class="avatar-large boy-skull"></div>
+                    <p class="graffiti-text">EleganceCoin</p>
+                </div>
+                <div class="skills-section">
+                    <h3 data-i18n="preRaceSkills">🚀 Habilidades Pre-Carrera</h3>
+                    <p data-i18n="watchVideoGet">Ver 1 video = 3 habilidades</p>
+                    <button id="loadSkillsBtn" class="btn-primary" data-i18n="loadSkills">Cargar Habilidades</button>
+                    <div class="skills-inventory">
+                        <div class="skill-item" data-skill="jetpack">🚀 Jetpack: <span>0</span></div>
+                        <div class="skill-item" data-skill="shield">🛹 Tabla: <span>0</span></div>
+                        <div class="skill-item" data-skill="magnet">🧲 Imán: <span>0</span></div>
+                        <div class="skill-item" data-skill="jump">⬆️ Super Salto: <span>0</span></div>
+                        <div class="skill-item" data-skill="speed">⚡ Velocidad: <span>0</span></div>
+                    </div>
+                </div>
+                <button id="startGameBtn" class="btn-start" data-i18n="run">¡CORRER!</button>
+            </div>
+            <canvas id="gameCanvas" class="game-canvas hidden"></canvas>
+            <div id="gameHUD" class="game-hud hidden">
+                <div class="hud-top">
+                    <div class="hearts">
+                        <span class="heart">❤️</span>
+                        <span class="heart">❤️</span>
+                        <span class="heart">❤️</span>
+                    </div>
+                    <div class="hud-coins"><span id="hudCoins">0</span> 🪙</div>
+                </div>
+                <div class="hud-bottom">
+                    <button id="pauseBtn" class="btn-pause">⏸️</button>
+                </div>
+            </div>
+            <div id="gameOverScreen" class="game-over-screen hidden">
+                <h2>💀 Game Over</h2>
+                <p><span data-i18n="coinsWon">Monedas ganadas</span>: <span id="finalCoins">0</span></p>
+                <button id="reviveBtn" class="btn-primary" data-i18n="revive">Revivir (Ver Video)</button>
+                <button id="doubleBtn" class="btn-primary" data-i18n="double">Multiplicar x2 (Ver Video)</button>
+                <button id="menuBtn" class="btn-secondary" data-i18n="backMenu">Volver al Menú</button>
+            </div>
+        </section>
 
-                // Melodía siniestra en loop
-                const playMelody = () => {
-                    if (!this.isMusicPlaying) return;
+        <!-- PESTAÑA 4: RANKING -->
+        <section id="rankingTab" class="tab-content">
+            <h2 data-i18n="ranking">🏆 Tabla de Clasificación</h2>
+            <div class="player-stats">
+                <h3 data-i18n="yourBalance">Tu Saldo Total</h3>
+                <p class="big-number"><span id="totalBalance">0</span> <span data-i18n="coins">monedas</span></p>
+                <p><span data-i18n="currentLeague">Liga Actual</span>: <span id="currentLeague">Bronce</span></p>
+            </div>
+            <div class="leagues-list">
+                <h3 data-i18n="leagues">Ligas</h3>
+                <div class="league-item"><span class="league-icon">🥉</span><span class="league-name">Bronce</span><span class="league-req">500K</span></div>
+                <div class="league-item"><span class="league-icon">🥈</span><span class="league-name">Plata</span><span class="league-req">1M</span></div>
+                <div class="league-item"><span class="league-icon">🥇</span><span class="league-name">Oro</span><span class="league-req">5M</span></div>
+                <div class="league-item"><span class="league-icon">💎</span><span class="league-name">Diamante</span><span class="league-req">10M</span></div>
+                <div class="league-item"><span class="league-icon">💚</span><span class="league-name">Esmeralda</span><span class="league-req">20M</span></div>
+                <div class="league-item"><span class="league-icon">❤️</span><span class="league-name">Rubí</span><span class="league-req">35M</span></div>
+                <div class="league-item"><span class="league-icon">💙</span><span class="league-name">Zafiro</span><span class="league-req">50M</span></div>
+                <div class="league-item"><span class="league-icon">🔮</span><span class="league-name">Mítico</span><span class="league-req">85M</span></div>
+                <div class="league-item"><span class="league-icon">👻</span><span class="league-name">Inmortal</span><span class="league-req">95M</span></div>
+                <div class="league-item"><span class="league-icon">🌟</span><span class="league-name">Legendario</span><span class="league-req">100M</span></div>
+            </div>
+        </section>
 
-                    // Notas de una escala menor (sonido tenebroso)
-                    const notes = [
-                        { freq: 220, duration: 0.5 }, // A3
-                        { freq: 246.94, duration: 0.5 }, // B3
-                        { freq: 261.63, duration: 0.5 }, // C4
-                        { freq: 293.66, duration: 0.5 }, // D4
-                        { freq: 329.63, duration: 0.5 }, // E4
-                        { freq: 349.23, duration: 0.5 }, // F4
-                        { freq: 392.00, duration: 0.5 }, // G4
-                        { freq: 440.00, duration: 0.5 }  // A4
-                    ];
+        <!-- PESTAÑA 5: BILLETERA -->
+        <section id="walletTab" class="tab-content">
+            <h2 data-i18n="wallet">💰 Billetera y Retiros</h2>
+            <div class="wallet-info">
+                <div class="settings-gear" id="langGear">⚙️</div>
+                <div class="lang-menu" id="langMenu">
+                    <div class="lang-option selected" data-lang="es">🇪🇸 Español</div>
+                    <div class="lang-option" data-lang="en">🇺🇸 English</div>
+                    <div class="lang-option" data-lang="ru">🇷🇺 Русский</div>
+                    <div class="lang-option" data-lang="zh">🇨🇳 中文</div>
+                </div>
+                <h3 data-i18n="yourWallet">Tu Billetera</h3>
+                <div class="wallet-address">
+                    <label data-i18n="linkedWallet">Wallet Vinculada:</label>
+                    <input type="text" id="walletAddress" placeholder="USDT/TON Wallet">
+                    <button id="saveWalletBtn" class="btn-small" data-i18n="save">Guardar</button>
+                </div>
+            </div>
+            <div class="withdrawal-policy">
+                <h3 data-i18n="withdrawPolicy">📋 Política de Retiros</h3>
+                <p class="policy-text" data-i18n="policyText">
+                    Cada 40 días se realiza la evaluación de puntos acumulados en tu balance de EleganceCoin.
+                    El reparto de dinero real en USDT se enviará directamente a tu Billetera de Telegram vinculada,
+                    proporcional a tu actividad y puntuación. Entre más juegues y subas en la tabla, mayor será
+                    tu recompensa en dólares reales. Sin inversiones, solo juega y gana.
+                </p>
+            </div>
+            <div class="withdrawal-buttons">
+                <h3 data-i18n="withdrawFunds" style="grid-column: 1/-1;">Retirar Fondos</h3>
+                <button class="btn-withdraw" data-amount="1">$1.00 USD</button>
+                <button class="btn-withdraw" data-amount="5">$5.00 USD</button>
+                <button class="btn-withdraw" data-amount="10">$10.00 USD</button>
+                <button class="btn-withdraw" data-amount="20">$20.00 USD</button>
+            </div>
+        </section>
+    </main>
 
-                    let time = now;
-                    notes.forEach(note => {
-                        const oscillator = ctx.createOscillator();
-                        const gainNode = ctx.createGain();
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-tab="missionsTab">
+            <span class="nav-icon">🎯</span>
+            <span class="nav-text" data-i18n="navMissions">Misiones</span>
+        </button>
+        <button class="nav-btn" data-tab="wardrobeTab">
+            <span class="nav-icon">👗</span>
+            <span class="nav-text" data-i18n="navWardrobe">Vestidor</span>
+        </button>
+        <button class="nav-btn central" data-tab="gameTab">
+            <span class="nav-icon">🎮</span>
+            <span class="nav-text" data-i18n="navPlay">Jugar</span>
+        </button>
+        <button class="nav-btn" data-tab="rankingTab">
+            <span class="nav-icon">🏆</span>
+            <span class="nav-text" data-i18n="navRanking">Ranking</span>
+        </button>
+        <button class="nav-btn" data-tab="walletTab">
+            <span class="nav-icon">💰</span>
+            <span class="nav-text" data-i18n="navWallet">Wallet</span>
+        </button>
+    </nav>
 
-                        oscillator.connect(gainNode);
-                        gainNode.connect(ctx.destination);
+    <div id="bannerAdSpace" class="banner-ad-space">
+        <p class="placeholder-text">Banner Ad (Adsgram/Monlix)</p>
+    </div>
+</div>
 
-                        oscillator.frequency.value = note.freq;
-                        oscillator.type = 'sine';
+<script>
+// ============================================
+// SISTEMA DE AUDIO COMPLETO
+// ============================================
+class AudioManager {
+    constructor() {
+        this.ctx = null;
+        this.musicPlaying = false;
+        this.musicNodes = [];
+        this.initialized = false;
+    }
 
-                        gainNode.gain.setValueAtTime(0.05, time);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, time + note.duration);
+    init() {
+        if (this.initialized) return;
+        try {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.initialized = true;
+        } catch(e) { console.log('Audio no soportado'); }
+    }
 
-                        oscillator.start(time);
-                        oscillator.stop(time + note.duration);
+    // Música Halloween melódica (suave, en loop)
+    startHalloweenMusic() {
+        if (!this.ctx || this.musicPlaying) return;
+        this.musicPlaying = true;
+        this.playMusicLoop();
+    }
 
-                        time += note.duration;
-                    });
+    playMusicLoop() {
+        if (!this.musicPlaying || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        // Escala menor melódica - tono tenebroso pero melódico
+        const melody = [
+            {f: 220.00, d: 0.6}, // A3
+            {f: 261.63, d: 0.6}, // C4
+            {f: 293.66, d: 0.6}, // D4
+            {f: 329.63, d: 0.8}, // E4
+            {f: 293.66, d: 0.6}, // D4
+            {f: 261.63, d: 0.6}, // C4
+            {f: 246.94, d: 0.8}, // B3
+            {f: 220.00, d: 1.0}  // A3
+        ];
+        let t = now;
+        melody.forEach(note => {
+            // Oscilador principal (flauta suave)
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = note.f;
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(0.04, t + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + note.d);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + note.d);
+            this.musicNodes.push(osc);
 
-                    // Repetir cada 4 segundos
-                    setTimeout(playMelody, 4000);
-                };
+            // Armónico suave (octava arriba)
+            const osc2 = this.ctx.createOscillator();
+            const gain2 = this.ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.value = note.f * 2;
+            gain2.gain.setValueAtTime(0, t);
+            gain2.gain.linearRampToValueAtTime(0.015, t + 0.05);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t + note.d);
+            osc2.connect(gain2);
+            gain2.connect(this.ctx.destination);
+            osc2.start(t);
+            osc2.stop(t + note.d);
+            this.musicNodes.push(osc2);
 
-                playMelody();
-                return { stop: () => { this.isMusicPlaying = false; } };
-            }
+            t += note.d;
+        });
+        // Bajo profundo
+        const bass = this.ctx.createOscillator();
+        const bassGain = this.ctx.createGain();
+        bass.type = 'sine';
+        bass.frequency.value = 55; // A1
+        bassGain.gain.setValueAtTime(0.06, now);
+        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 5);
+        bass.connect(bassGain);
+        bassGain.connect(this.ctx.destination);
+        bass.start(now);
+        bass.stop(now + 5);
+        this.musicNodes.push(bass);
 
-            stopBackgroundMusic() {
-                if (this.backgroundMusic) {
-                    this.backgroundMusic.stop();
-                    this.isMusicPlaying = false;
-                }
-            }
+        setTimeout(() => this.playMusicLoop(), 5000);
+    }
 
-            // Efecto de sonido: Moneda/Ding
-            playCoinSound() {
-                if (!this.audioContext) return;
+    stopMusic() {
+        this.musicPlaying = false;
+        this.musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
+        this.musicNodes = [];
+    }
 
-                const ctx = this.audioContext;
-                const now = ctx.currentTime;
+    // Sonido de moneda (ding cristalino)
+    playCoinSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [1318.51, 1567.98, 2093.00].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0, now + i*0.03);
+            gain.gain.linearRampToValueAtTime(0.15, now + i*0.03 + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i*0.03);
+            osc.stop(now + 0.3);
+        });
+    }
 
-                // Sonido de moneda (ding agudo)
-                const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
+    // Sonido Jetpack (propulsión)
+    playJetpackSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.5);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+    }
 
-                oscillator.connect(gainNode);
-                gainNode.connect(ctx.destination);
+    // Sonido Tabla/Escudo (metálico protector)
+    playShieldSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [440, 554.37, 659.25].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0, now + i*0.05);
+            gain.gain.linearRampToValueAtTime(0.1, now + i*0.05 + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i*0.05);
+            osc.stop(now + 0.4);
+        });
+    }
 
-                oscillator.frequency.setValueAtTime(880, now); // A5
-                oscillator.frequency.exponentialRampToValueAtTime(1760, now + 0.1); // A6
-                oscillator.type = 'sine';
+    // Sonido Imán (magnético)
+    playMagnetSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(800, now + 0.3);
+        osc.frequency.linearRampToValueAtTime(200, now + 0.6);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+    }
 
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    // Sonido Super Salto
+    playJumpSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    }
 
-                oscillator.start(now);
-                oscillator.stop(now + 0.2);
-            }
+    // Sonido Velocidad (turbo)
+    playSpeedSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        for (let i = 0; i < 5; i++) {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.value = 400 + i*100;
+            gain.gain.setValueAtTime(0, now + i*0.05);
+            gain.gain.linearRampToValueAtTime(0.08, now + i*0.05 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.05 + 0.15);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i*0.05);
+            osc.stop(now + i*0.05 + 0.15);
+        }
+    }
 
-            // Efecto de sonido: Colisión
-            playHitSound() {
-                if (!this.audioContext) return;
+    // Sonido de colisión
+    playHitSound() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    }
+}
 
-                const ctx = this.audioContext;
-                const now = ctx.currentTime;
+const audio = new AudioManager();
 
-                // Sonido de impacto (ruido grave)
-                const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
+// ============================================
+// SISTEMA DE IDIOMAS (4 idiomas)
+// ============================================
+const translations = {
+    es: {
+        missions: "🎯 Misiones y Tareas",
+        dailyReward: "📅 Recompensa Diaria",
+        day: "Día",
+        coins: "monedas",
+        claimVideo: "Reclamar (Ver Video)",
+        marathon: "🎬 Maratón de Anuncios",
+        marathonDesc: "Ve hasta 20 videos diarios",
+        reward: "Recompensa",
+        watchNow: "Ver Video Ahora",
+        videosToday: "Videos vistos hoy",
+        invite: "👥 Invitar Amigos",
+        inviteDesc: "Gana 5,000 monedas por cada amigo",
+        copyLink: "Copiar Link de Referido",
+        externalTasks: "🔗 Tareas Externas",
+        telegramTasks: "📱 Tareas de Telegram",
+        wardrobe: "👗 Vestidor y Tienda",
+        selectChar: "Selecciona Personaje",
+        boySkull: "Chico Calavera",
+        girlSkull: "Chica Calavera",
+        shoes: "👟 Calzado (10 videos)",
+        hats: "🧢 Gorras (20 videos)",
+        shirts: "👕 Camisetas (30 videos)",
+        pants: "👖 Pantalones (40 videos)",
+        outfits: "🎭 Trajes (50 videos)",
+        boards: "🛹 Tablas (50 videos)",
+        preRaceSkills: "🚀 Habilidades Pre-Carrera",
+        watchVideoGet: "Ver 1 video = 3 habilidades",
+        loadSkills: "Cargar Habilidades",
+        run: "¡CORRER!",
+        coinsWon: "Monedas ganadas",
+        revive: "Revivir (Ver Video)",
+        double: "Multiplicar x2 (Ver Video)",
+        backMenu: "Volver al Menú",
+        ranking: "🏆 Tabla de Clasificación",
+        yourBalance: "Tu Saldo Total",
+        currentLeague: "Liga Actual",
+        leagues: "Ligas",
+        wallet: "💰 Billetera y Retiros",
+        yourWallet: "Tu Billetera",
+        linkedWallet: "Wallet Vinculada:",
+        save: "Guardar",
+        withdrawPolicy: "📋 Política de Retiros",
+        policyText: "Cada 40 días se realiza la evaluación de puntos acumulados en tu balance de EleganceCoin. El reparto de dinero real en USDT se enviará directamente a tu Billetera de Telegram vinculada, proporcional a tu actividad y puntuación. Entre más juegues y subas en la tabla, mayor será tu recompensa en dólares reales. Sin inversiones, solo juega y gana.",
+        withdrawFunds: "Retirar Fondos",
+        navMissions: "Misiones",
+        navWardrobe: "Vestidor",
+        navPlay: "Jugar",
+        navRanking: "Ranking",
+        navWallet: "Wallet"
+    },
+    en: {
+        missions: "🎯 Missions & Tasks",
+        dailyReward: "📅 Daily Reward",
+        day: "Day",
+        coins: "coins",
+        claimVideo: "Claim (Watch Video)",
+        marathon: "🎬 Ad Marathon",
+        marathonDesc: "Watch up to 20 videos daily",
+        reward: "Reward",
+        watchNow: "Watch Video Now",
+        videosToday: "Videos watched today",
+        invite: "👥 Invite Friends",
+        inviteDesc: "Earn 5,000 coins per friend",
+        copyLink: "Copy Referral Link",
+        externalTasks: "🔗 External Tasks",
+        telegramTasks: "📱 Telegram Tasks",
+        wardrobe: "👗 Wardrobe & Shop",
+        selectChar: "Select Character",
+        boySkull: "Skull Boy",
+        girlSkull: "Skull Girl",
+        shoes: "👟 Shoes (10 videos)",
+        hats: "🧢 Hats (20 videos)",
+        shirts: "👕 Shirts (30 videos)",
+        pants: "👖 Pants (40 videos)",
+        outfits: "🎭 Outfits (50 videos)",
+        boards: "🛹 Boards (50 videos)",
+        preRaceSkills: "🚀 Pre-Race Skills",
+        watchVideoGet: "Watch 1 video = 3 skills",
+        loadSkills: "Load Skills",
+        run: "RUN!",
+        coinsWon: "Coins won",
+        revive: "Revive (Watch Video)",
+        double: "Double x2 (Watch Video)",
+        backMenu: "Back to Menu",
+        ranking: "🏆 Leaderboard",
+        yourBalance: "Your Total Balance",
+        currentLeague: "Current League",
+        leagues: "Leagues",
+        wallet: "💰 Wallet & Withdrawals",
+        yourWallet: "Your Wallet",
+        linkedWallet: "Linked Wallet:",
+        save: "Save",
+        withdrawPolicy: "📋 Withdrawal Policy",
+        policyText: "Every 40 days, accumulated points in your EleganceCoin balance are evaluated. Real money in USDT will be sent directly to your linked Telegram Wallet, proportional to your activity and score. The more you play and climb the leaderboard, the greater your reward in real dollars. No investments, just play and win.",
+        withdrawFunds: "Withdraw Funds",
+        navMissions: "Missions",
+        navWardrobe: "Wardrobe",
+        navPlay: "Play",
+        navRanking: "Ranking",
+        navWallet: "Wallet"
+    },
+    ru: {
+        missions: "🎯 Миссии и Задания",
+        dailyReward: "📅 Ежедневная Награда",
+        day: "День",
+        coins: "монет",
+        claimVideo: "Получить (Смотреть Видео)",
+        marathon: "🎬 Марафон Рекламы",
+        marathonDesc: "Смотрите до 20 видео в день",
+        reward: "Награда",
+        watchNow: "Смотреть Сейчас",
+        videosToday: "Просмотрено сегодня",
+        invite: "👥 Пригласить Друзей",
+        inviteDesc: "Получите 5,000 монет за друга",
+        copyLink: "Копировать Ссылку",
+        externalTasks: "🔗 Внешние Задания",
+        telegramTasks: "📱 Задания Telegram",
+        wardrobe: "👗 Гардероб и Магазин",
+        selectChar: "Выберите Персонажа",
+        boySkull: "Парень Череп",
+        girlSkull: "Девушка Череп",
+        shoes: "👟 Обувь (10 видео)",
+        hats: "🧢 Шапки (20 видео)",
+        shirts: "👕 Рубашки (30 видео)",
+        pants: "👖 Штаны (40 видео)",
+        outfits: "🎭 Костюмы (50 видео)",
+        boards: "🛹 Доски (50 видео)",
+        preRaceSkills: "🚀 Навыки Перед Забегом",
+        watchVideoGet: "1 видео = 3 навыка",
+        loadSkills: "Загрузить Навыки",
+        run: "БЕЖАТЬ!",
+        coinsWon: "Заработано монет",
+        revive: "Возродиться (Видео)",
+        double: "Удвоить x2 (Видео)",
+        backMenu: "В Меню",
+        ranking: "🏆 Таблица Лидеров",
+        yourBalance: "Ваш Баланс",
+        currentLeague: "Текущая Лига",
+        leagues: "Лиги",
+        wallet: "💰 Кошелёк и Вывод",
+        yourWallet: "Ваш Кошелёк",
+        linkedWallet: "Привязанный Кошелёк:",
+        save: "Сохранить",
+        withdrawPolicy: "📋 Политика Вывода",
+        policyText: "Каждые 40 дней оцениваются накопленные баллы в вашем балансе EleganceCoin. Реальные деньги в USDT будут отправлены напрямую в ваш привязанный кошелёк Telegram, пропорционально вашей активности и счёту. Чем больше играете и поднимаетесь в таблице, тем больше награда в реальных долларах. Без вложений, просто играйте и выигрывайте.",
+        withdrawFunds: "Вывести Средства",
+        navMissions: "Миссии",
+        navWardrobe: "Гардероб",
+        navPlay: "Играть",
+        navRanking: "Рейтинг",
+        navWallet: "Кошелёк"
+    },
+    zh: {
+        missions: "🎯 任务与活动",
+        dailyReward: "📅 每日奖励",
+        day: "天",
+        coins: "金币",
+        claimVideo: "领取(观看视频)",
+        marathon: "🎬 广告马拉松",
+        marathonDesc: "每日最多观看20个视频",
+        reward: "奖励",
+        watchNow: "立即观看",
+        videosToday: "今日已观看",
+        invite: "👥 邀请好友",
+        inviteDesc: "每位好友获得5,000金币",
+        copyLink: "复制推荐链接",
+        externalTasks: "🔗 外部任务",
+        telegramTasks: "📱 Telegram任务",
+        wardrobe: "👗 衣橱与商店",
+        selectChar: "选择角色",
+        boySkull: "骷髅男孩",
+        girlSkull: "骷髅女孩",
+        shoes: "👟 鞋子(10视频)",
+        hats: "🧢 帽子(20视频)",
+        shirts: "👕 衬衫(30视频)",
+        pants: "👖 裤子(40视频)",
+        outfits: "🎭 套装(50视频)",
+        boards: "🛹 滑板(50视频)",
+        preRaceSkills: "🚀 赛前技能",
+        watchVideoGet: "观看1视频 = 3技能",
+        loadSkills: "加载技能",
+        run: "开跑!",
+        coinsWon: "获得金币",
+        revive: "复活(观看视频)",
+        double: "翻倍x2(观看视频)",
+        backMenu: "返回菜单",
+        ranking: "🏆 排行榜",
+        yourBalance: "您的总余额",
+        currentLeague: "当前联赛",
+        leagues: "联赛",
+        wallet: "💰 钱包与提现",
+        yourWallet: "您的钱包",
+        linkedWallet: "绑定钱包:",
+        save: "保存",
+        withdrawPolicy: "📋 提现政策",
+        policyText: "每40天评估一次您EleganceCoin余额中累积的积分。真实USDT资金将直接发送到您绑定的Telegram钱包,与您的活动和得分成正比。您玩得越多,排名越高,获得的真实美元奖励就越多。无需投资,只需玩和赢。",
+        withdrawFunds: "提现资金",
+        navMissions: "任务",
+        navWardrobe: "衣橱",
+        navPlay: "游戏",
+        navRanking: "排行",
+        navWallet: "钱包"
+    }
+};
 
-                oscillator.connect(gainNode);
-                gainNode.connect(ctx.destination);
+let currentLang = 'es';
 
-                oscillator.frequency.setValueAtTime(100, now);
-                oscillator.frequency.exponentialRampToValueAtTime(50, now + 0.3);
-                oscillator.type = 'sawtooth';
+function applyLanguage(lang) {
+    currentLang = lang;
+    const dict = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+    });
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.lang === lang);
+    });
+    localStorage.setItem('eleganceLang', lang);
+}
 
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+// ============================================
+// ESTADO DEL JUEGO
+// ============================================
+const gameState = {
+    coins: 0, selectedCharacter: 'boy', currentDay: 1,
+    videosWatchedToday: 0,
+    skills: { jetpack: 0, shield: 0, magnet: 0, jump: 0, speed: 0 },
+    walletAddress: '', isPlaying: false, lives: 3, currentCoins: 0
+};
 
-                oscillator.start(now);
-                oscillator.stop(now + 0.3);
+function loadGameState() {
+    const saved = localStorage.getItem('eleganceGamerState');
+    if (saved) {
+        try {
+            Object.assign(gameState, JSON.parse(saved));
+            updateUI();
+        } catch(e) {}
+    }
+    const savedLang = localStorage.getItem('eleganceLang');
+    if (savedLang && translations[savedLang]) applyLanguage(savedLang);
+}
+
+function saveGameState() {
+    localStorage.setItem('eleganceGamerState', JSON.stringify(gameState));
+}
+
+function updateUI() {
+    document.getElementById('coinBalance').textContent = formatNumber(gameState.coins);
+    document.getElementById('currentDay').textContent = gameState.currentDay;
+    document.getElementById('dailyReward').textContent = formatNumber(gameState.currentDay * 1000);
+    document.getElementById('videosWatched').textContent = gameState.videosWatchedToday;
+    document.getElementById('totalBalance').textContent = formatNumber(gameState.coins);
+    document.getElementById('walletAddress').value = gameState.walletAddress;
+    Object.keys(gameState.skills).forEach(skill => {
+        const el = document.querySelector(`[data-skill="${skill}"] span`);
+        if (el) el.textContent = gameState.skills[skill];
+    });
+    updateCurrentLeague();
+}
+
+function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+}
+
+function updateCurrentLeague() {
+    const leagues = [
+        {name:'Bronce', req:500000}, {name:'Plata', req:1000000},
+        {name:'Oro', req:5000000}, {name:'Diamante', req:10000000},
+        {name:'Esmeralda', req:20000000}, {name:'Rubí', req:35000000},
+        {name:'Zafiro', req:50000000}, {name:'Mítico', req:85000000},
+        {name:'Inmortal', req:95000000}, {name:'Legendario', req:100000000}
+    ];
+    let current = 'Bronce';
+    for (let l of leagues) if (gameState.coins >= l.req) current = l.name;
+    document.getElementById('currentLeague').textContent = current;
+    document.querySelectorAll('.league-item').forEach(item => {
+        item.classList.remove('current');
+        if (item.textContent.includes(current)) item.classList.add('current');
+    });
+}
+
+// ============================================
+// PANTALLA DE CARGA Y START
+// ============================================
+function createCoinsRain() {
+    const container = document.getElementById('coinsRain');
+    for (let i = 0; i < 15; i++) {
+        const coin = document.createElement('div');
+        coin.className = 'coin-3d';
+        coin.style.left = Math.random() * 100 + '%';
+        coin.style.animationDelay = Math.random() * 4 + 's';
+        coin.style.animationDuration = (3 + Math.random() * 2) + 's';
+        container.appendChild(coin);
+    }
+}
+
+function showStartScreen() {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('startScreen').classList.add('active');
+}
+
+document.getElementById('startAppBtn').addEventListener('click', () => {
+    audio.init();
+    audio.startHalloweenMusic();
+    document.getElementById('startScreen').classList.remove('active');
+    document.getElementById('mainContainer').classList.remove('hidden');
+});
+
+// ============================================
+// NAVEGACIÓN
+// ============================================
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (tabId === 'gameTab') {
+            audio.init();
+            audio.startHalloweenMusic();
+        } else {
+            audio.stopMusic();
+        }
+    });
+});
+
+// ============================================
+// SELECTOR DE PERSONAJE
+// ============================================
+document.querySelectorAll('.character-card').forEach(card => {
+    card.addEventListener('click', () => {
+        document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        gameState.selectedCharacter = card.dataset.character;
+        document.getElementById('selectedAvatar').className = `avatar-large ${gameState.selectedCharacter}-skull`;
+        saveGameState();
+    });
+});
+
+// ============================================
+// IDIOMAS (TUERCA)
+// ============================================
+document.getElementById('langGear').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('langMenu').classList.toggle('active');
+});
+document.querySelectorAll('.lang-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+        applyLanguage(opt.dataset.lang);
+        document.getElementById('langMenu').classList.remove('active');
+    });
+});
+document.addEventListener('click', () => {
+    document.getElementById('langMenu').classList.remove('active');
+});
+
+// ============================================
+// MISISIONES
+// ============================================
+function showRewardedAd(callback) {
+    audio.init();
+    // Simulación - En producción se integra Adsgram UnitID 52617
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.showAlert) {
+        tg.showAlert('🎬 Viendo anuncio de 30s...\n(Simulación - Integrar Adsgram UnitID 52617)');
+    }
+    setTimeout(() => { if (callback) callback(); }, 500);
+}
+
+document.getElementById('claimDailyBtn').addEventListener('click', () => {
+    showRewardedAd(() => {
+        const reward = gameState.currentDay * 1000;
+        gameState.coins += reward;
+        gameState.currentDay++;
+        updateUI(); saveGameState();
+        audio.playCoinSound();
+        const tg = window.Telegram?.WebApp;
+        if (tg?.showAlert) tg.showAlert(`+${formatNumber(reward)} monedas!`);
+    });
+});
+
+document.getElementById('marathonBtn').addEventListener('click', () => {
+    if (gameState.videosWatchedToday >= 20) {
+        const tg = window.Telegram?.WebApp;
+        if (tg?.showAlert) tg.showAlert('Límite diario alcanzado');
+        return;
+    }
+    showRewardedAd(() => {
+        gameState.coins += 500;
+        gameState.videosWatchedToday++;
+        updateUI(); saveGameState();
+        audio.playCoinSound();
+    });
+});
+
+document.getElementById('inviteBtn').addEventListener('click', () => {
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'user';
+    const link = `https://t.me/YourBotName?start=ref_${userId}`;
+    navigator.clipboard?.writeText(link).then(() => {
+        const tg = window.Telegram?.WebApp;
+        if (tg?.showAlert) tg.showAlert('Link copiado');
+    }).catch(() => {
+        const tg = window.Telegram?.WebApp;
+        if (tg?.showAlert) tg.showAlert(`Link: ${link}`);
+    });
+});
+
+document.getElementById('loadSkillsBtn').addEventListener('click', () => {
+    showRewardedAd(() => {
+        gameState.skills.jetpack += 1;
+        gameState.skills.shield += 1;
+        gameState.skills.magnet += 1;
+        updateUI(); saveGameState();
+        audio.playJetpackSound();
+    });
+});
+
+// ============================================
+// WALLET
+// ============================================
+document.getElementById('saveWalletBtn').addEventListener('click', () => {
+    const addr = document.getElementById('walletAddress').value.trim();
+    if (addr) {
+        gameState.walletAddress = addr;
+        saveGameState();
+        const tg = window.Telegram?.WebApp;
+        if (tg?.showAlert) tg.showAlert('Wallet guardada');
+    }
+});
+
+document.querySelectorAll('.btn-withdraw').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (!gameState.walletAddress) {
+            const tg = window.Telegram?.WebApp;
+            if (tg?.showAlert) tg.showAlert('Vincula tu wallet primero');
+            return;
+        }
+        const tg = window.Telegram?.WebApp;
+        if (tg?.showAlert) tg.showAlert(`Retiro de $${btn.dataset.amount} solicitado`);
+    });
+});
+
+// ============================================
+// JUEGO RUNNER
+// ============================================
+let canvas, ctx, player, obstacles, coins, gameLoop;
+let gameSpeed = 5;
+
+document.getElementById('startGameBtn').addEventListener('click', startGame);
+
+function startGame() {
+    audio.init();
+    gameState.isPlaying = true;
+    gameState.lives = 3;
+    gameState.currentCoins = 0;
+    document.querySelector('.game-menu').classList.add('hidden');
+    document.getElementById('gameCanvas').classList.remove('hidden');
+    document.getElementById('gameHUD').classList.remove('hidden');
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    player = {
+        x: canvas.width / 2 - 25, y: canvas.height - 150,
+        width: 50, height: 50, lane: 1, jumping: false, jumpHeight: 0
+    };
+    obstacles = []; coins = [];
+    gameSpeed = 5;
+    updateHUD();
+    gameLoop = setInterval(updateGame, 1000/60);
+    setupTouchControls();
+}
+
+function setupTouchControls() {
+    let touchStartX = 0;
+    canvas.ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
+    canvas.ontouchend = (e) => {
+        const diff = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0 && player.lane < 2) player.lane++;
+            else if (diff < 0 && player.lane > 0) player.lane--;
+        } else {
+            if (!player.jumping) {
+                player.jumping = true;
+                player.jumpHeight = 0;
+                audio.playJumpSound();
             }
         }
+    };
+}
 
-        const audioManager = new AudioManager();
+function updateGame() {
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const laneWidth = canvas.width / 3;
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(laneWidth * i, 0);
+        ctx.lineTo(laneWidth * i, canvas.height);
+        ctx.stroke();
+    }
+    player.x = laneWidth * player.lane + (laneWidth - player.width) / 2;
+    if (player.jumping) {
+        player.jumpHeight += 10;
+        if (player.jumpHeight >= 100) { player.jumping = false; player.jumpHeight = 0; }
+    }
+    const playerY = player.y - player.jumpHeight;
+    ctx.fillStyle = gameState.selectedCharacter === 'boy' ? '#00ff00' : '#8b00ff';
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/2, playerY + player.height/2, player.width/2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/3, playerY + player.height/3, 5, 0, Math.PI*2);
+    ctx.arc(player.x + 2*player.width/3, playerY + player.height/3, 5, 0, Math.PI*2);
+    ctx.fill();
+    if (Math.random() < 0.02) {
+        const lane = Math.floor(Math.random() * 3);
+        obstacles.push({ x: laneWidth*lane + (laneWidth-50)/2, y: -50, width: 50, height: 50 });
+    }
+    if (Math.random() < 0.03) {
+        const lane = Math.floor(Math.random() * 3);
+        coins.push({ x: laneWidth*lane + (laneWidth-30)/2, y: -30, width: 30, height: 30 });
+    }
+    obstacles = obstacles.filter(obs => {
+        obs.y += gameSpeed;
+        ctx.fillStyle = '#ff6b00';
+        ctx.beginPath();
+        ctx.arc(obs.x + obs.width/2, obs.y + obs.height/2, obs.width/2, 0, Math.PI*2);
+        ctx.fill();
+        if (checkCollision(player, obs, playerY)) {
+            gameState.lives--;
+            updateHUD();
+            audio.playHitSound();
+            if (gameState.lives <= 0) endGame();
+            return false;
+        }
+        return obs.y < canvas.height;
+    });
+    coins = coins.filter(coin => {
+        coin.y += gameSpeed;
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/2, 0, Math.PI*2);
+        ctx.fill();
+        if (checkCollision(player, coin, playerY)) {
+            gameState.currentCoins += 10;
+            updateHUD();
+            audio.playCoinSound();
+            return false;
+        }
+        return coin.y < canvas.height;
+    });
+    gameSpeed += 0.001;
+}
 
-        // ============================================
-        // INICIALIZACIÓN DE TELEGRAM WEB APP
-        // ============================================
+function checkCollision(o1, o2, pY) {
+    return o1.x < o2.x + o2.width && o1.x + o1.width > o2.x &&
+           pY < o2.y + o2.height && pY + o1.height > o2.y;
+}
+
+function updateHUD() {
+    document.getElementById('hudCoins').textContent = gameState.currentCoins;
+    document.querySelectorAll('.heart').forEach((h, i) => {
+        h.textContent = i < gameState.lives ? '❤️' : '💔';
+    });
+}
+
+function endGame() {
+    clearInterval(gameLoop);
+    gameState.isPlaying = false;
+    document.getElementById('gameCanvas').classList.add('hidden');
+    document.getElementById('gameHUD').classList.add('hidden');
+    document.getElementById('gameOverScreen').classList.remove('hidden');
+    document.getElementById('finalCoins').textContent = gameState.currentCoins;
+}
+
+document.getElementById('reviveBtn').addEventListener('click', () => {
+    showRewardedAd(() => {
+        gameState.lives = 3;
+        document.getElementById('gameOverScreen').classList.add('hidden');
+        document.getElementById('gameCanvas').classList.remove('hidden');
+        document.getElementById('gameHUD').classList.remove('hidden');
+        updateHUD();
+        gameLoop = setInterval(updateGame, 1000/60);
+    });
+});
+
+document.getElementById('doubleBtn').addEventListener('click', () => {
+    showRewardedAd(() => {
+        gameState.coins += gameState.currentCoins * 2;
+        updateUI(); saveGameState();
+        returnToMenu();
+        audio.playCoinSound();
+    });
+});
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+    gameState.coins += gameState.currentCoins;
+    updateUI(); saveGameState();
+    returnToMenu();
+});
+
+function returnToMenu() {
+    document.getElementById('gameOverScreen').classList.add('hidden');
+    document.querySelector('.game-menu').classList.remove('hidden');
+}
+
+document.getElementById('pauseBtn').addEventListener('click', () => {
+    if (gameState.isPlaying) {
+        clearInterval(gameLoop);
+        gameState.isPlaying = false;
+    }
+});
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+window.addEventListener('load', () => {
+    createCoinsRain();
+    loadGameState();
+    // Telegram WebApp
+    if (window.Telegram?.WebApp) {
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.setHeaderColor('#0a0a0a');
         tg.setBackgroundColor('#0a0a0a');
+    }
+    // Transición de carga a start
+    setTimeout(showStartScreen, 2800);
+});
 
-        // ============================================
-        // ESTADO GLOBAL DEL JUEGO
-        // ============================================
-        const gameState = {
-            coins: 0,
-            selectedCharacter: 'boy',
-            currentDay: 1,
-            videosWatchedToday: 0,
-            skills: {
-                jetpack: 0,
-                shield: 0,
-                magnet: 0,
-                jump: 0,
-                speed: 0
-            },
-            unlockedItems: {
-                shoes: [],
-                hats: [],
-                shirts: [],
-                pants: [],
-                outfits: [],
-                boards: []
-            },
-            walletAddress: '',
-            isPlaying: false,
-            lives: 3,
-            currentCoins: 0
-        };
-
-        // ============================================
-        // FUNCIONES DE ESTADO
-        // ============================================
-        function loadGameState() {
-            const saved = localStorage.getItem('eleganceGamerState');
-            if (saved) {
-                Object.assign(gameState, JSON.parse(saved));
-                updateUI();
-            }
-        }
-
-        function saveGameState() {
-            localStorage.setItem('eleganceGamerState', JSON.stringify(gameState));
-        }
-
-        function updateUI() {
-            document.getElementById('coinBalance').textContent = formatNumber(gameState.coins);
-            document.getElementById('currentDay').textContent = gameState.currentDay;
-            document.getElementById('dailyReward').textContent = formatNumber(gameState.currentDay * 1000);
-            document.getElementById('videosWatched').textContent = gameState.videosWatchedToday;
-            document.getElementById('totalBalance').textContent = formatNumber(gameState.coins);
-            document.getElementById('walletAddress').value = gameState.walletAddress;
-            
-            Object.keys(gameState.skills).forEach(skill => {
-                const element = document.querySelector(`[data-skill="${skill}"] span`);
-                if (element) {
-                    element.textContent = gameState.skills[skill];
-                }
-            });
-            
-            updateCurrentLeague();
-        }
-
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toString();
-        }
-
-        function updateCurrentLeague() {
-            const leagues = [
-                { name: 'Bronce', req: 500000 },
-                { name: 'Plata', req: 1000000 },
-                { name: 'Oro', req: 5000000 },
-                { name: 'Diamante', req: 10000000 },
-                { name: 'Esmeralda', req: 20000000 },
-                { name: 'Rubí', req: 35000000 },
-                { name: 'Zafiro', req: 50000000 },
-                { name: 'Mítico', req: 85000000 },
-                { name: 'Inmortal', req: 95000000 },
-                { name: 'Legendario', req: 100000000 }
-            ];
-            
-            let currentLeague = 'Bronce';
-            for (let league of leagues) {
-                if (gameState.coins >= league.req) {
-                    currentLeague = league.name;
-                }
-            }
-            
-            document.getElementById('currentLeague').textContent = currentLeague;
-            
-            document.querySelectorAll('.league-item').forEach(item => {
-                item.classList.remove('current');
-                if (item.textContent.includes(currentLeague)) {
-                    item.classList.add('current');
-                }
-            });
-        }
-
-        // ============================================
-        // NAVEGACIÓN ENTRE PESTAÑAS
-        // ============================================
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabId = btn.dataset.tab;
-                
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                
-                document.getElementById(tabId).classList.add('active');
-                
-                document.querySelectorAll('.nav-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                btn.classList.add('active');
-
-                // Iniciar música al entrar al juego
-                if (tabId === 'gameTab') {
-                    audioManager.playBackgroundMusic();
-                } else {
-                    audioManager.stopBackgroundMusic();
-                }
-            });
-        });
-
-        // ============================================
-        // SELECCIÓN DE PERSONAJE
-        // ============================================
-        document.querySelectorAll('.character-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                gameState.selectedCharacter = card.dataset.character;
-                
-                const avatar = document.getElementById('selectedAvatar');
-                avatar.className = `avatar-large ${gameState.selectedCharacter}-skull`;
-                
-                saveGameState();
-            });
-        });
-
-        // ============================================
-        // MIS
+window.addEventListener('resize', () => {
+    if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+});
+</script>
+</body>
+    </html>
