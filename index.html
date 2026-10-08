@@ -2,1610 +2,781 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Elegance Gamer - Runner Money</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-:root {
-    --primary: #ff6b00;
-    --secondary: #8b00ff;
-    --accent: #00ff00;
-    --bg-dark: #0a0a0a;
-    --bg-card: #1a1a2e;
-    --text: #ffffff;
-    --dim: #aaaaaa;
-    --danger: #ff0000;
-    --success: #00ff00;
-}
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text); overflow-x: hidden; user-select: none; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--p:#ff6b00;--s:#8b00ff;--a:#00ff00;--bg:#0a0a0a;--card:#1a1a2e;--t:#fff;--d:#aaa}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t);overflow:hidden;user-select:none}
+.hidden{display:none!important}
 
-/* ============================================
-   PANTALLA DE CARGA URBANA 3D
-   ============================================ */
-.loading-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a1a2e 100%);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999; overflow: hidden;
-    perspective: 1000px;
-}
-.loading-screen::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: 
-        radial-gradient(circle at 20% 30%, rgba(255,107,0,0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(139,0,255,0.15) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(0,255,0,0.08) 0%, transparent 50%);
-    animation: bgPulse 4s ease-in-out infinite;
-}
-@keyframes bgPulse {
-    0%,100% { opacity: 0.6; } 50% { opacity: 1; }
-}
-.loading-content {
-    text-align: center; z-index: 10; position: relative;
-    transform-style: preserve-3d;
-}
-.game-logo {
-    font-size: 52px; font-weight: 900; margin-bottom: 20px;
-    text-shadow: 0 0 30px var(--primary), 0 0 60px var(--secondary);
-    letter-spacing: 3px;
-    animation: logoFloat 3s ease-in-out infinite;
-    font-family: 'Impact', 'Arial Black', sans-serif;
-}
-.pumpkin {
-    display: inline-block; color: var(--primary);
-    animation: pumpkinSpin 2s ease-in-out infinite;
-    text-shadow: 0 0 20px var(--primary);
-}
-@keyframes pumpkinSpin {
-    0%,100% { transform: rotateY(0deg) scale(1); }
-    50% { transform: rotateY(180deg) scale(1.2); }
-}
-@keyframes logoFloat {
-    0%,100% { transform: translateY(0) rotateX(0deg); }
-    50% { transform: translateY(-10px) rotateX(5deg); }
-}
+/* LOADING */
+.loading-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0a0a0a,#1a0a2e,#0a1a2e);display:flex;align-items:center;justify-content:center;z-index:9999;overflow:hidden}
+.loading-screen::before{content:'';position:absolute;width:100%;height:100%;background:radial-gradient(circle at 20% 30%,rgba(255,107,0,.15),transparent 50%),radial-gradient(circle at 80% 70%,rgba(139,0,255,.15),transparent 50%);animation:bgP 4s ease-in-out infinite}
+@keyframes bgP{0%,100%{opacity:.6}50%{opacity:1}}
+.load-content{text-align:center;z-index:10}
+.game-logo{font-size:48px;font-weight:900;text-shadow:0 0 30px var(--p),0 0 60px var(--s);letter-spacing:3px;animation:logoF 3s ease-in-out infinite;font-family:Impact,'Arial Black',sans-serif}
+.pumpkin{display:inline-block;color:var(--p);animation:pumpS 2s ease-in-out infinite}
+@keyframes pumpS{0%,100%{transform:rotateY(0) scale(1)}50%{transform:rotateY(180deg) scale(1.2)}}
+@keyframes logoF{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.chars-3d{display:flex;justify-content:center;gap:40px;margin:30px 0;perspective:800px}
+.c3d{width:90px;height:130px;position:relative;transform-style:preserve-3d}
+.c3d.boy{animation:cB 2s ease-in-out infinite}
+.c3d.girl{animation:cB 2s ease-in-out infinite 1s}
+@keyframes cB{0%,100%{transform:translateY(0) rotateY(0)}25%{transform:translateY(-25px) rotateY(15deg)}50%{transform:translateY(0)}75%{transform:translateY(-15px) rotateY(-15deg)}}
+.c3d-head{width:55px;height:55px;border-radius:50%;position:absolute;top:0;left:50%;transform:translateX(-50%);background:radial-gradient(circle at 30% 30%,#444,#111)}
+.c3d.boy .c3d-head{box-shadow:0 0 20px #0f0}
+.c3d.girl .c3d-head{box-shadow:0 0 20px #8b00ff}
+.c3d-eyes{position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+.c3d-eye{width:9px;height:9px;border-radius:50%;animation:eG 1.5s ease-in-out infinite}
+.c3d.boy .c3d-eye{background:#0f0;box-shadow:0 0 10px #0f0}
+.c3d.girl .c3d-eye{background:#8b00ff;box-shadow:0 0 10px #8b00ff}
+@keyframes eG{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.c3d-body{width:45px;height:50px;position:absolute;top:50px;left:50%;transform:translateX(-50%);border-radius:8px;background:linear-gradient(180deg,#111,#222);border:2px solid #333}
+.c3d-legs{position:absolute;bottom:0;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.c3d-leg{width:14px;height:28px;background:#222;border-radius:4px;animation:lR .5s ease-in-out infinite}
+.c3d-leg:nth-child(2){animation-delay:.25s}
+@keyframes lR{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.coins-rain{position:absolute;width:100%;height:100%;pointer-events:none;z-index:5}
+.coin3d{position:absolute;width:28px;height:28px;background:radial-gradient(circle at 30% 30%,#ffd700,#ff8c00);border-radius:50%;box-shadow:0 0 12px #ffd700;animation:cF 4s linear infinite}
+.coin3d::after{content:'$';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#8b4513;font-weight:bold;font-size:14px}
+@keyframes cF{0%{transform:translateY(-50px) rotateY(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(100vh) rotateY(720deg);opacity:0}}
+.load-bar{width:260px;height:12px;background:#222;border-radius:6px;overflow:hidden;margin:20px auto;border:2px solid var(--p);box-shadow:0 0 20px rgba(255,107,0,.5)}
+.load-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--p),var(--s),var(--a));background-size:200% 100%;animation:ld 2.5s ease-in-out forwards,sh 1.5s linear infinite}
+@keyframes ld{to{width:100%}}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-/* PERSONAJES 3D EN PANTALLA DE CARGA */
-.characters-3d {
-    display: flex; justify-content: center; gap: 40px;
-    margin: 30px 0; perspective: 800px;
-}
-.char-3d {
-    width: 100px; height: 140px; position: relative;
-    transform-style: preserve-3d;
-    animation: charBounce 2s ease-in-out infinite;
-}
-.char-3d.boy { animation-delay: 0s; }
-.char-3d.girl { animation-delay: 1s; }
-@keyframes charBounce {
-    0%,100% { transform: translateY(0) rotateY(0deg); }
-    25% { transform: translateY(-30px) rotateY(15deg); }
-    50% { transform: translateY(0) rotateY(0deg); }
-    75% { transform: translateY(-20px) rotateY(-15deg); }
-}
-.char-head {
-    width: 60px; height: 60px; border-radius: 50%;
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    box-shadow: 0 0 20px currentColor;
-}
-.char-3d.boy .char-head {
-    background: radial-gradient(circle at 30% 30%, #444, #111);
-    color: #00ff00;
-}
-.char-3d.girl .char-head {
-    background: radial-gradient(circle at 30% 30%, #333, #000);
-    color: #8b00ff;
-}
-.char-eyes {
-    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 10px;
-}
-.char-eye {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: currentColor;
-    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
-    animation: eyeGlow 1.5s ease-in-out infinite;
-}
-@keyframes eyeGlow {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.3); }
-}
-.char-body {
-    width: 50px; height: 60px; position: absolute;
-    top: 55px; left: 50%; transform: translateX(-50%);
-    border-radius: 10px;
-}
-.char-3d.boy .char-body {
-    background: linear-gradient(180deg, #111 0%, #222 100%);
-    border: 2px solid #333;
-}
-.char-3d.girl .char-body {
-    background: linear-gradient(180deg, #222 0%, #111 100%);
-    border: 2px solid #444;
-}
-.char-legs {
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 8px;
-}
-.char-leg {
-    width: 15px; height: 30px; background: #222;
-    border-radius: 5px;
-    animation: legRun 0.5s ease-in-out infinite;
-}
-.char-leg:nth-child(2) { animation-delay: 0.25s; }
-@keyframes legRun {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
+/* START */
+.start-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0a0a0a,#1a0a2e);display:none;align-items:center;justify-content:center;z-index:9998;flex-direction:column}
+.start-screen.active{display:flex}
+.start-btn{padding:22px 55px;font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--s));border:none;border-radius:18px;color:#fff;cursor:pointer;letter-spacing:3px;box-shadow:0 10px 40px rgba(255,107,0,.6);animation:sP 2s ease-in-out infinite;text-transform:uppercase}
+@keyframes sP{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 
-/* MONEDAS SALTANDO */
-.coins-rain {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 5;
-}
-.coin-3d {
-    position: absolute; width: 30px; height: 30px;
-    background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
-    border-radius: 50%;
-    box-shadow: 0 0 15px #ffd700, inset -3px -3px 8px rgba(0,0,0,0.3);
-    animation: coinFall 4s linear infinite;
-}
-.coin-3d::after {
-    content: '$'; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    color: #8b4513; font-weight: bold; font-size: 16px;
-}
-@keyframes coinFall {
-    0% { transform: translateY(-50px) rotateY(0deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(100vh) rotateY(720deg); opacity: 0; }
-}
+/* MAIN */
+.main-container{display:flex;flex-direction:column;height:100vh}
+.game-header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:var(--card);border-bottom:2px solid var(--p);box-shadow:0 2px 10px rgba(255,107,0,.3)}
+.logo-sm{font-size:16px;font-weight:900}
+.bal-disp{display:flex;align-items:center;gap:5px;font-size:20px;font-weight:bold;color:var(--a)}
+.content-area{flex:1;overflow-y:auto;padding:15px;padding-bottom:140px}
+.tab-content{display:none;animation:fadeIn .3s}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.m-card{background:var(--card);border:2px solid var(--p);border-radius:15px;padding:18px;margin-bottom:12px;box-shadow:0 4px 15px rgba(255,107,0,.2)}
+.m-card h3{margin-bottom:8px;color:var(--p)}
+.m-card p{margin-bottom:8px;color:var(--d);font-size:14px}
+.btn-p{width:100%;padding:14px;background:linear-gradient(135deg,var(--p),var(--s));border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;box-shadow:0 4px 15px rgba(255,107,0,.4)}
+.btn-p:active{transform:scale(.95)}
+.btn-s{width:100%;padding:14px;background:#333;border:2px solid var(--d);border-radius:10px;color:#fff;font-size:15px;cursor:pointer;margin-top:8px}
+.btn-sm{padding:8px 14px;background:var(--p);border:none;border-radius:5px;color:#fff;font-size:13px;cursor:pointer}
+.char-sel{background:var(--card);border:2px solid var(--s);border-radius:15px;padding:18px;margin-bottom:18px}
+.chars{display:flex;gap:12px;justify-content:center;margin-top:12px}
+.char-c{flex:1;background:#2a2a3e;border:3px solid transparent;border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .3s}
+.char-c.sel{border-color:var(--a);box-shadow:0 0 20px rgba(0,255,0,.5)}
+.char-prev{width:70px;height:70px;margin:0 auto 8px;border-radius:50%}
+.boy-sk{background:linear-gradient(135deg,#0f0,#0a0)}
+.girl-sk{background:linear-gradient(135deg,#8b00ff,#50a)}
+.shop-sec{background:var(--card);border:2px solid var(--p);border-radius:15px;padding:18px;margin-bottom:12px}
+.shop-sec h3{margin-bottom:12px;color:var(--p);font-size:15px}
+.shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.shop-it{background:#2a2a3e;border:2px solid #444;border-radius:8px;padding:8px;text-align:center;font-size:11px;color:var(--d);cursor:pointer}
+.shop-it.unlocked{border-color:var(--a);color:var(--a)}
 
-/* BARRA DE CARGA */
-.loading-bar {
-    width: 280px; height: 12px; background: #222;
-    border-radius: 6px; overflow: hidden; margin: 20px auto;
-    border: 2px solid var(--primary);
-    box-shadow: 0 0 20px rgba(255,107,0,0.5);
-}
-.loading-fill {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-    background-size: 200% 100%;
-    animation: loading 2.5s ease-in-out forwards, shimmer 1.5s linear infinite;
-}
-@keyframes loading { to { width: 100%; } }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+/* GAME MENU */
+.game-menu{text-align:center;padding:10px}
+.av-disp{margin:20px 0}
+.av-lg{width:120px;height:120px;margin:0 auto 15px;border-radius:50%;border:4px solid var(--p);box-shadow:0 0 30px rgba(255,107,0,.6)}
+.graf{font-size:24px;font-weight:bold;color:var(--a);text-shadow:0 0 10px var(--a);font-family:'Courier New',monospace;letter-spacing:2px}
+.sk-sec{background:var(--card);border:2px solid var(--s);border-radius:15px;padding:18px;margin:15px 0}
+.sk-inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:12px}
+.sk-it{background:#2a2a3e;border:2px solid #444;border-radius:8px;padding:8px;font-size:13px}
+.btn-run{width:100%;padding:22px;background:linear-gradient(135deg,#f00,#ff6b00);border:none;border-radius:15px;color:#fff;font-size:22px;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(255,0,0,.5);margin-top:15px;animation:sP 2s infinite}
 
-/* PANTALLA START (después de cargar) */
-.start-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a1a2e 100%);
-    display: none; align-items: center; justify-content: center;
-    z-index: 9998; flex-direction: column;
-}
-.start-screen.active { display: flex; }
-.start-btn {
-    padding: 25px 60px; font-size: 28px; font-weight: 900;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none; border-radius: 20px; color: white;
-    cursor: pointer; letter-spacing: 3px;
-    box-shadow: 0 10px 40px rgba(255,107,0,0.6), 0 0 60px rgba(139,0,255,0.4);
-    animation: startPulse 2s ease-in-out infinite;
-    text-transform: uppercase;
-}
-@keyframes startPulse {
-    0%,100% { transform: scale(1); box-shadow: 0 10px 40px rgba(255,107,0,0.6); }
-    50% { transform: scale(1.05); box-shadow: 0 15px 60px rgba(255,107,0,0.9); }
-}
-.start-btn:active { transform: scale(0.95); }
+/* GAME CANVAS */
+#gameCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;display:none}
+.game-hud{position:fixed;top:0;left:0;width:100%;pointer-events:none;z-index:101;display:none}
+.hud-top{display:flex;justify-content:space-between;padding:15px}
+.hearts{font-size:28px}
+.hud-coins{font-size:20px;font-weight:bold;background:rgba(0,0,0,.7);padding:8px 16px;border-radius:10px}
+.hud-score{font-size:16px;background:rgba(0,0,0,.7);padding:6px 12px;border-radius:8px;position:absolute;top:15px;left:50%;transform:translateX(-50%)}
+.hud-bottom{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:102}
+.btn-pause{font-size:28px;background:rgba(0,0,0,.7);border:none;border-radius:50%;width:55px;height:55px;cursor:pointer;pointer-events:auto}
+.go-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:103}
+.go-screen.active{display:flex}
+.go-screen h2{font-size:44px;color:#f00;margin-bottom:15px}
+.go-screen p{font-size:22px;margin-bottom:25px}
+.go-screen button{width:80%;max-width:280px;margin:8px 0}
 
-.hidden { display: none !important; }
+/* RANKING */
+.p-stats{background:var(--card);border:2px solid var(--a);border-radius:15px;padding:18px;margin-bottom:18px;text-align:center}
+.big-n{font-size:32px;font-weight:bold;color:var(--a);margin:8px 0}
+.lg-list{background:var(--card);border:2px solid var(--p);border-radius:15px;padding:18px}
+.lg-it{display:flex;align-items:center;padding:12px;border-bottom:1px solid #333}
+.lg-it:last-child{border-bottom:none}
+.lg-it.cur{background:rgba(255,107,0,.2);border-left:4px solid var(--p)}
+.lg-ic{font-size:28px;margin-right:12px}
+.lg-nm{flex:1;font-size:16px;font-weight:bold}
+.lg-rq{font-size:14px;color:var(--d)}
 
-/* ============================================
-   CONTENEDOR PRINCIPAL
-   ============================================ */
-.main-container {
-    display: flex; flex-direction: column; height: 100vh; position: relative;
-}
-.game-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px; background: var(--bg-card);
-    border-bottom: 2px solid var(--primary);
-    box-shadow: 0 2px 10px rgba(255,107,0,0.3);
-}
-.logo-small { font-size: 18px; font-weight: 900; }
-.balance-display {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 22px; font-weight: bold; color: var(--accent);
-}
-.coin-icon { font-size: 26px; }
+/* WALLET */
+.w-info{background:var(--card);border:2px solid var(--a);border-radius:15px;padding:18px;margin-bottom:18px;position:relative}
+.w-addr{margin-top:12px}
+.w-addr label{display:block;margin-bottom:8px;color:var(--d);font-size:13px}
+.w-addr input{width:100%;padding:10px;background:#2a2a3e;border:2px solid #444;border-radius:8px;color:#fff;font-size:13px;margin-bottom:8px}
+.gear{position:absolute;top:12px;right:12px;width:36px;height:36px;background:#2a2a3e;border:2px solid var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:transform .3s}
+.gear:hover{transform:rotate(90deg)}
+.lang-m{position:absolute;top:52px;right:12px;background:var(--card);border:2px solid var(--p);border-radius:10px;padding:8px;display:none;z-index:200;min-width:160px;box-shadow:0 5px 20px rgba(0,0,0,.5)}
+.lang-m.active{display:block}
+.lang-o{padding:8px;cursor:pointer;border-radius:5px;display:flex;align-items:center;gap:8px;font-size:14px;transition:background .2s}
+.lang-o:hover{background:#2a2a3e}
+.lang-o.sel{background:var(--p);color:#fff}
+.w-pol{background:var(--card);border:2px solid var(--s);border-radius:15px;padding:18px;margin-bottom:18px}
+.pol-t{font-size:13px;line-height:1.6;color:var(--d)}
+.w-btns{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.btn-w{padding:18px;background:linear-gradient(135deg,var(--a),#0a0);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 4px 15px rgba(0,255,0,.3)}
 
-.content-area {
-    flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 140px;
-}
-.tab-content { display: none; animation: fadeIn 0.3s; }
-.tab-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.mission-card {
-    background: var(--bg-card); border: 2px solid var(--primary);
-    border-radius: 15px; padding: 20px; margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(255,107,0,0.2);
-}
-.mission-card h3 { margin-bottom: 10px; color: var(--primary); }
-.mission-card p { margin-bottom: 10px; color: var(--dim); }
-.small-text { font-size: 12px; color: var(--dim); }
-.placeholder-text { text-align: center; padding: 20px; color: var(--dim); font-style: italic; }
-
-.btn-primary {
-    width: 100%; padding: 15px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none; border-radius: 10px; color: white;
-    font-size: 16px; font-weight: bold; cursor: pointer;
-    transition: transform 0.2s;
-    box-shadow: 0 4px 15px rgba(255,107,0,0.4);
-}
-.btn-primary:active { transform: scale(0.95); }
-.btn-secondary {
-    width: 100%; padding: 15px; background: #333;
-    border: 2px solid var(--dim); border-radius: 10px;
-    color: white; font-size: 16px; cursor: pointer; margin-top: 10px;
-}
-.btn-small {
-    padding: 8px 15px; background: var(--primary);
-    border: none; border-radius: 5px; color: white;
-    font-size: 14px; cursor: pointer;
-}
-
-.character-selector {
-    background: var(--bg-card); border: 2px solid var(--secondary);
-    border-radius: 15px; padding: 20px; margin-bottom: 20px;
-}
-.characters { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
-.character-card {
-    flex: 1; background: #2a2a3e; border: 3px solid transparent;
-    border-radius: 10px; padding: 15px; text-align: center;
-    cursor: pointer; transition: all 0.3s;
-}
-.character-card.selected {
-    border-color: var(--accent);
-    box-shadow: 0 0 20px rgba(0,255,0,0.5);
-}
-.character-preview {
-    width: 80px; height: 80px; margin: 0 auto 10px;
-    border-radius: 50%;
-}
-.boy-skull { background: linear-gradient(135deg, #00ff00, #00aa00); }
-.girl-skull { background: linear-gradient(135deg, #8b00ff, #5500aa); }
-
-.shop-section {
-    background: var(--bg-card); border: 2px solid var(--primary);
-    border-radius: 15px; padding: 20px; margin-bottom: 15px;
-}
-.shop-section h3 { margin-bottom: 15px; color: var(--primary); }
-.shop-items {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-}
-.shop-item {
-    background: #2a2a3e; border: 2px solid #444;
-    border-radius: 10px; padding: 10px; text-align: center;
-    cursor: pointer; font-size: 12px; color: var(--dim);
-}
-.shop-item.unlocked { border-color: var(--accent); color: var(--accent); }
-
-.game-menu { text-align: center; }
-.avatar-display { margin: 30px 0; }
-.avatar-large {
-    width: 150px; height: 150px; margin: 0 auto 20px;
-    border-radius: 50%; border: 4px solid var(--primary);
-    box-shadow: 0 0 30px rgba(255,107,0,0.6);
-}
-.graffiti-text {
-    font-size: 28px; font-weight: bold; color: var(--accent);
-    text-shadow: 0 0 10px var(--accent);
-    font-family: 'Courier New', monospace; letter-spacing: 3px;
-}
-.skills-section {
-    background: var(--bg-card); border: 2px solid var(--secondary);
-    border-radius: 15px; padding: 20px; margin: 20px 0;
-}
-.skills-inventory {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px; margin-top: 15px;
-}
-.skill-item {
-    background: #2a2a3e; border: 2px solid #444;
-    border-radius: 10px; padding: 10px; font-size: 14px;
-}
-.btn-start {
-    width: 100%; padding: 25px;
-    background: linear-gradient(135deg, #ff0000, #ff6b00);
-    border: none; border-radius: 15px; color: white;
-    font-size: 24px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 6px 20px rgba(255,0,0,0.5);
-    margin-top: 20px; animation: startPulse 2s infinite;
-}
-
-.game-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 100;
-}
-.game-hud {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 101;
-}
-.hud-top { display: flex; justify-content: space-between; padding: 20px; }
-.hearts { font-size: 32px; }
-.hud-coins {
-    font-size: 24px; font-weight: bold;
-    background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 10px;
-}
-.hud-bottom { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); }
-.btn-pause {
-    font-size: 32px; background: rgba(0,0,0,0.7);
-    border: none; border-radius: 50%; width: 60px; height: 60px;
-    pointer-events: auto; cursor: pointer;
-}
-.game-over-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 102;
-}
-.game-over-screen h2 { font-size: 48px; color: var(--danger); margin-bottom: 20px; }
-.game-over-screen p { font-size: 24px; margin-bottom: 30px; }
-.game-over-screen button { width: 80%; max-width: 300px; margin: 10px 0; }
-
-.player-stats {
-    background: var(--bg-card); border: 2px solid var(--accent);
-    border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center;
-}
-.big-number { font-size: 36px; font-weight: bold; color: var(--accent); margin: 10px 0; }
-.leagues-list {
-    background: var(--bg-card); border: 2px solid var(--primary);
-    border-radius: 15px; padding: 20px;
-}
-.league-item {
-    display: flex; align-items: center; padding: 15px;
-    border-bottom: 1px solid #333; transition: background 0.3s;
-}
-.league-item:last-child { border-bottom: none; }
-.league-item.current {
-    background: rgba(255,107,0,0.2);
-    border-left: 4px solid var(--primary);
-}
-.league-icon { font-size: 32px; margin-right: 15px; }
-.league-name { flex: 1; font-size: 18px; font-weight: bold; }
-.league-req { font-size: 16px; color: var(--dim); }
-
-.wallet-info {
-    background: var(--bg-card); border: 2px solid var(--accent);
-    border-radius: 15px; padding: 20px; margin-bottom: 20px;
-    position: relative;
-}
-.wallet-address { margin-top: 15px; }
-.wallet-address label { display: block; margin-bottom: 10px; color: var(--dim); }
-.wallet-address input {
-    width: 100%; padding: 12px; background: #2a2a3e;
-    border: 2px solid #444; border-radius: 8px; color: white;
-    font-size: 14px; margin-bottom: 10px;
-}
-
-/* TUERCA DE IDIOMAS */
-.settings-gear {
-    position: absolute; top: 15px; right: 15px;
-    width: 40px; height: 40px; background: #2a2a3e;
-    border: 2px solid var(--primary); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; cursor: pointer;
-    transition: transform 0.3s;
-}
-.settings-gear:hover { transform: rotate(90deg); }
-.lang-menu {
-    position: absolute; top: 60px; right: 15px;
-    background: var(--bg-card); border: 2px solid var(--primary);
-    border-radius: 10px; padding: 10px; display: none;
-    z-index: 200; min-width: 180px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-}
-.lang-menu.active { display: block; }
-.lang-option {
-    padding: 10px; cursor: pointer; border-radius: 5px;
-    display: flex; align-items: center; gap: 10px;
-    transition: background 0.2s;
-}
-.lang-option:hover { background: #2a2a3e; }
-.lang-option.selected { background: var(--primary); color: white; }
-
-.withdrawal-policy {
-    background: var(--bg-card); border: 2px solid var(--secondary);
-    border-radius: 15px; padding: 20px; margin-bottom: 20px;
-}
-.policy-text { font-size: 14px; line-height: 1.6; color: var(--dim); }
-.withdrawal-buttons {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
-}
-.btn-withdraw {
-    padding: 20px;
-    background: linear-gradient(135deg, var(--success), #00aa00);
-    border: none; border-radius: 10px; color: white;
-    font-size: 18px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,255,0,0.3);
-}
-
-.bottom-nav {
-    position: fixed; bottom: 80px; left: 0; width: 100%;
-    display: flex; justify-content: space-around;
-    background: var(--bg-card); border-top: 2px solid var(--primary);
-    padding: 10px 0; z-index: 50;
-}
-.nav-btn {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    gap: 5px; background: none; border: none; color: var(--dim);
-    cursor: pointer; transition: all 0.3s; padding: 10px 5px;
-}
-.nav-btn.active { color: var(--primary); transform: translateY(-5px); }
-.nav-btn.central { transform: translateY(-15px); }
-.nav-btn.central.active { transform: translateY(-20px); }
-.nav-icon { font-size: 24px; }
-.nav-text { font-size: 12px; }
-
-.banner-ad-space {
-    position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
-    background: #1a1a1a; border-top: 2px solid #333;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 49;
-}
-
-@media (max-width: 480px) {
-    .game-logo { font-size: 36px; }
-    .characters { flex-direction: column; }
-    .skills-inventory { grid-template-columns: repeat(2, 1fr); }
-    .char-3d { width: 80px; height: 110px; }
-    .char-head { width: 50px; height: 50px; }
-    .char-body { width: 40px; height: 50px; top: 45px; }
-}
+/* NAV */
+.bottom-nav{position:fixed;bottom:80px;left:0;width:100%;display:flex;justify-content:space-around;background:var(--card);border-top:2px solid var(--p);padding:8px 0;z-index:50}
+.nav-b{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--d);cursor:pointer;transition:all .3s;padding:8px 4px}
+.nav-b.active{color:var(--p);transform:translateY(-4px)}
+.nav-b.cen{transform:translateY(-12px)}
+.nav-b.cen.active{transform:translateY(-16px)}
+.nav-ic{font-size:22px}
+.nav-tx{font-size:11px}
+.banner-ad{position:fixed;bottom:0;left:0;width:100%;height:80px;background:#1a1a1a;border-top:2px solid #333;display:flex;align-items:center;justify-content:center;z-index:49}
 </style>
 </head>
 <body>
 
-<!-- PANTALLA DE CARGA URBANA 3D -->
-<div id="loadingScreen" class="loading-screen">
-    <div class="coins-rain" id="coinsRain"></div>
-    <div class="loading-content">
-        <h1 class="game-logo">RUNNER <span class="pumpkin">O</span>MONEY</h1>
-        <div class="characters-3d">
-            <div class="char-3d boy">
-                <div class="char-head">
-                    <div class="char-eyes">
-                        <div class="char-eye"></div>
-                        <div class="char-eye"></div>
-                    </div>
-                </div>
-                <div class="char-body"></div>
-                <div class="char-legs">
-                    <div class="char-leg"></div>
-                    <div class="char-leg"></div>
-                </div>
-            </div>
-            <div class="char-3d girl">
-                <div class="char-head">
-                    <div class="char-eyes">
-                        <div class="char-eye"></div>
-                        <div class="char-eye"></div>
-                    </div>
-                </div>
-                <div class="char-body"></div>
-                <div class="char-legs">
-                    <div class="char-leg"></div>
-                    <div class="char-leg"></div>
-                </div>
-            </div>
-        </div>
-        <div class="loading-bar">
-            <div class="loading-fill"></div>
-        </div>
-        <p style="color: var(--dim); margin-top: 10px;">Cargando Elegance Gamer...</p>
-    </div>
+<div id="loadScr" class="loading-screen">
+<div class="coins-rain" id="cRain"></div>
+<div class="load-content">
+<h1 class="game-logo">RUNNER <span class="pumpkin">O</span>MONEY</h1>
+<div class="chars-3d">
+<div class="c3d boy"><div class="c3d-head"><div class="c3d-eyes"><div class="c3d-eye"></div><div class="c3d-eye"></div></div></div><div class="c3d-body"></div><div class="c3d-legs"><div class="c3d-leg"></div><div class="c3d-leg"></div></div></div>
+<div class="c3d girl"><div class="c3d-head"><div class="c3d-eyes"><div class="c3d-eye"></div><div class="c3d-eye"></div></div></div><div class="c3d-body"></div><div class="c3d-legs"><div class="c3d-leg"></div><div class="c3d-leg"></div></div></div>
+</div>
+<div class="load-bar"><div class="load-fill"></div></div>
+<p style="color:var(--d);margin-top:8px">Cargando Elegance Gamer...</p>
+</div>
 </div>
 
-<!-- PANTALLA START -->
-<div id="startScreen" class="start-screen">
-    <h1 class="game-logo" style="margin-bottom: 40px;">RUNNER <span class="pumpkin">O</span>MONEY</h1>
-    <button class="start-btn" id="startAppBtn">EMPEZAR</button>
+<div id="startScr" class="start-screen">
+<h1 class="game-logo" style="margin-bottom:35px">RUNNER <span class="pumpkin">O</span>MONEY</h1>
+<button class="start-btn" id="startBtn">EMPEZAR</button>
 </div>
 
-<!-- CONTENEDOR PRINCIPAL -->
-<div id="mainContainer" class="main-container hidden">
-    <header class="game-header">
-        <div class="logo-small">RUNNER <span class="pumpkin">O</span>MONEY</div>
-        <div class="balance-display">
-            <span id="coinBalance">0</span>
-            <span class="coin-icon">🪙</span>
-        </div>
-    </header>
+<div id="mainC" class="main-container hidden">
+<header class="game-header">
+<div class="logo-sm">RUNNER <span class="pumpkin">O</span>MONEY</div>
+<div class="bal-disp"><span id="coinBal">0</span><span>🪙</span></div>
+</header>
+<main class="content-area">
+<section id="missionsTab" class="tab-content active">
+<h2>🎯 Misiones</h2>
+<div class="m-card"><h3>📅 Recompensa Diaria</h3><p>Día <span id="cDay">1</span>: <span id="dRew">1,000</span> monedas</p><button id="claimBtn" class="btn-p">Reclamar (Ver Video)</button></div>
+<div class="m-card"><h3>🎬 Maratón de Anuncios</h3><p>Ve hasta 20 videos diarios · 500 monedas c/u</p><button id="marBtn" class="btn-p">Ver Video</button><p style="font-size:12px">Hoy: <span id="vWatch">0</span>/20</p></div>
+<div class="m-card"><h3>👥 Invitar Amigos</h3><p>5,000 monedas por amigo</p><button id="invBtn" class="btn-p">Copiar Link</button></div>
+<div class="m-card"><h3>🔗 Tareas Externas</h3><p style="text-align:center;color:var(--d);font-style:italic">Monlix Offerwall</p></div>
+<div class="m-card"><h3>📱 Tareas Telegram</h3><p style="text-align:center;color:var(--d);font-style:italic">Telegram Tasks</p></div>
+</section>
+<section id="wardrobeTab" class="tab-content">
+<h2>👗 Vestidor</h2>
+<div class="char-sel"><h3>Personaje</h3><div class="chars"><div class="char-c sel" data-ch="boy"><div class="char-prev boy-sk"></div><p>Chico</p></div><div class="char-c" data-ch="girl"><div class="char-prev girl-sk"></div><p>Chica</p></div></div></div>
+<div class="shop-sec"><h3>👟 Calzado (10 vid)</h3><div class="shop-items" id="shoesS"></div></div>
+<div class="shop-sec"><h3>🧢 Gorras (20 vid)</h3><div class="shop-items" id="hatsS"></div></div>
+<div class="shop-sec"><h3>👕 Camisetas (30 vid)</h3><div class="shop-items" id="shirtsS"></div></div>
+<div class="shop-sec"><h3>👖 Pantalones (40 vid)</h3><div class="shop-items" id="pantsS"></div></div>
+<div class="shop-sec"><h3>🎭 Trajes (50 vid)</h3><div class="shop-items" id="outfitsS"></div></div>
+<div class="shop-sec"><h3>🛹 Tablas (50 vid)</h3><div class="shop-items" id="boardsS"></div></div>
+</section>
+<section id="gameTab" class="tab-content">
+<div class="game-menu" id="gameMenu">
+<div class="av-disp"><div id="selAv" class="av-lg boy-sk"></div><p class="graf">EleganceCoin</p></div>
+<div class="sk-sec"><h3>🚀 Habilidades</h3><p style="font-size:13px;color:var(--d)">1 video = 3 habilidades</p><button id="loadSkBtn" class="btn-p" style="margin-top:10px">Cargar</button>
+<div class="sk-inv"><div class="sk-it" data-sk="jetpack">🚀 Jet: <span>0</span></div><div class="sk-it" data-sk="shield">🛹 Tabla: <span>0</span></div><div class="sk-it" data-sk="magnet">🧲 Imán: <span>0</span></div><div class="sk-it" data-sk="jump">⬆️ Salto: <span>0</span></div><div class="sk-it" data-sk="speed">⚡ Speed: <span>0</span></div></div></div>
+<button id="runBtn" class="btn-run">¡CORRER!</button>
+</div>
+</section>
+<section id="rankingTab" class="tab-content">
+<h2>🏆 Ranking</h2>
+<div class="p-stats"><h3>Saldo Total</h3><p class="big-n"><span id="totBal">0</span></p><p>Liga: <span id="curLg">Bronce</span></p></div>
+<div class="lg-list"><h3>Ligas</h3>
+<div class="lg-it"><span class="lg-ic">🥉</span><span class="lg-nm">Bronce</span><span class="lg-rq">500K</span></div>
+<div class="lg-it"><span class="lg-ic">🥈</span><span class="lg-nm">Plata</span><span class="lg-rq">1M</span></div>
+<div class="lg-it"><span class="lg-ic">🥇</span><span class="lg-nm">Oro</span><span class="lg-rq">5M</span></div>
+<div class="lg-it"><span class="lg-ic">💎</span><span class="lg-nm">Diamante</span><span class="lg-rq">10M</span></div>
+<div class="lg-it"><span class="lg-ic">💚</span><span class="lg-nm">Esmeralda</span><span class="lg-rq">20M</span></div>
+<div class="lg-it"><span class="lg-ic">❤️</span><span class="lg-nm">Rubí</span><span class="lg-rq">35M</span></div>
+<div class="lg-it"><span class="lg-ic">💙</span><span class="lg-nm">Zafiro</span><span class="lg-rq">50M</span></div>
+<div class="lg-it"><span class="lg-ic">🔮</span><span class="lg-nm">Mítico</span><span class="lg-rq">85M</span></div>
+<div class="lg-it"><span class="lg-ic">👻</span><span class="lg-nm">Inmortal</span><span class="lg-rq">95M</span></div>
+<div class="lg-it"><span class="lg-ic">🌟</span><span class="lg-nm">Legendario</span><span class="lg-rq">100M</span></div>
+</div>
+</section>
+<section id="walletTab" class="tab-content">
+<h2>💰 Billetera</h2>
+<div class="w-info">
+<div class="gear" id="langGear">⚙️</div>
+<div class="lang-m" id="langMenu">
+<div class="lang-o sel" data-lang="es">🇪🇸 Español</div>
+<div class="lang-o" data-lang="en">🇺🇸 English</div>
+<div class="lang-o" data-lang="ru">🇷🇺 Русский</div>
+<div class="lang-o" data-lang="zh">🇨🇳 中文</div>
+</div>
+<h3>Tu Wallet</h3>
+<div class="w-addr"><label>Wallet USDT/TON:</label><input type="text" id="wAddr" placeholder="Tu dirección"><button id="saveWBtn" class="btn-sm">Guardar</button></div>
+</div>
+<div class="w-pol"><h3>📋 Política</h3><p class="pol-t">Cada 40 días se evalúan los puntos acumulados. El reparto en USDT se envía a tu Wallet de Telegram proporcional a tu actividad. Sin inversiones, solo juega y gana.</p></div>
+<div class="w-btns"><button class="btn-w" data-amt="1">$1 USD</button><button class="btn-w" data-amt="5">$5 USD</button><button class="btn-w" data-amt="10">$10 USD</button><button class="btn-w" data-amt="20">$20 USD</button></div>
+</section>
+</main>
+<nav class="bottom-nav">
+<button class="nav-b active" data-tab="missionsTab"><span class="nav-ic">🎯</span><span class="nav-tx">Misiones</span></button>
+<button class="nav-b" data-tab="wardrobeTab"><span class="nav-ic">👗</span><span class="nav-tx">Vestidor</span></button>
+<button class="nav-b cen" data-tab="gameTab"><span class="nav-ic">🎮</span><span class="nav-tx">Jugar</span></button>
+<button class="nav-b" data-tab="rankingTab"><span class="nav-ic">🏆</span><span class="nav-tx">Ranking</span></button>
+<button class="nav-b" data-tab="walletTab"><span class="nav-ic">💰</span><span class="nav-tx">Wallet</span></button>
+</nav>
+<div class="banner-ad"><p style="color:#666;font-size:12px">Banner Ad (Adsgram 52617)</p></div>
+</div>
 
-    <main class="content-area">
-        <!-- PESTAÑA 1: MISIONES -->
-        <section id="missionsTab" class="tab-content active">
-            <h2 data-i18n="missions">🎯 Misiones y Tareas</h2>
-            <div class="mission-card">
-                <h3 data-i18n="dailyReward">📅 Recompensa Diaria</h3>
-                <p><span data-i18n="day">Día</span> <span id="currentDay">1</span>: <span id="dailyReward">1,000</span> <span data-i18n="coins">monedas</span></p>
-                <button id="claimDailyBtn" class="btn-primary" data-i18n="claimVideo">Reclamar (Ver Video)</button>
-            </div>
-            <div class="mission-card">
-                <h3 data-i18n="marathon">🎬 Maratón de Anuncios</h3>
-                <p data-i18n="marathonDesc">Ve hasta 20 videos diarios</p>
-                <p><span data-i18n="reward">Recompensa</span>: 500 <span data-i18n="coins">monedas</span></p>
-                <button id="marathonBtn" class="btn-primary" data-i18n="watchNow">Ver Video Ahora</button>
-                <p class="small-text"><span data-i18n="videosToday">Videos vistos hoy</span>: <span id="videosWatched">0</span>/20</p>
-            </div>
-            <div class="mission-card">
-                <h3 data-i18n="invite">👥 Invitar Amigos</h3>
-                <p data-i18n="inviteDesc">Gana 5,000 monedas por cada amigo</p>
-                <button id="inviteBtn" class="btn-primary" data-i18n="copyLink">Copiar Link de Referido</button>
-            </div>
-            <div class="mission-card">
-                <h3 data-i18n="externalTasks">🔗 Tareas Externas</h3>
-                <div id="offerwallContainer"><p class="placeholder-text">Monlix Offerwall</p></div>
-            </div>
-            <div class="mission-card">
-                <h3 data-i18n="telegramTasks">📱 Tareas de Telegram</h3>
-                <div id="telegramTasksContainer"><p class="placeholder-text">Telegram Tasks</p></div>
-            </div>
-        </section>
-
-        <!-- PESTAÑA 2: VESTIDOR -->
-        <section id="wardrobeTab" class="tab-content">
-            <h2 data-i18n="wardrobe">👗 Vestidor y Tienda</h2>
-            <div class="character-selector">
-                <h3 data-i18n="selectChar">Selecciona Personaje</h3>
-                <div class="characters">
-                    <div class="character-card selected" data-character="boy">
-                        <div class="character-preview boy-skull"></div>
-                        <p data-i18n="boySkull">Chico Calavera</p>
-                    </div>
-                    <div class="character-card" data-character="girl">
-                        <div class="character-preview girl-skull"></div>
-                        <p data-i18n="girlSkull">Chica Calavera</p>
-                    </div>
-                </div>
-            </div>
-            <div class="shop-section">
-                <h3 data-i18n="shoes">👟 Calzado (10 videos)</h3>
-                <div class="shop-items" id="shoesShop"></div>
-            </div>
-            <div class="shop-section">
-                <h3 data-i18n="hats">🧢 Gorras (20 videos)</h3>
-                <div class="shop-items" id="hatsShop"></div>
-            </div>
-            <div class="shop-section">
-                <h3 data-i18n="shirts">👕 Camisetas (30 videos)</h3>
-                <div class="shop-items" id="shirtsShop"></div>
-            </div>
-            <div class="shop-section">
-                <h3 data-i18n="pants">👖 Pantalones (40 videos)</h3>
-                <div class="shop-items" id="pantsShop"></div>
-            </div>
-            <div class="shop-section">
-                <h3 data-i18n="outfits">🎭 Trajes (50 videos)</h3>
-                <div class="shop-items" id="fullOutfitsShop"></div>
-            </div>
-            <div class="shop-section">
-                <h3 data-i18n="boards">🛹 Tablas (50 videos)</h3>
-                <div class="shop-items" id="boardsShop"></div>
-            </div>
-        </section>
-
-        <!-- PESTAÑA 3: JUEGO -->
-        <section id="gameTab" class="tab-content">
-            <div class="game-menu">
-                <div class="avatar-display">
-                    <div id="selectedAvatar" class="avatar-large boy-skull"></div>
-                    <p class="graffiti-text">EleganceCoin</p>
-                </div>
-                <div class="skills-section">
-                    <h3 data-i18n="preRaceSkills">🚀 Habilidades Pre-Carrera</h3>
-                    <p data-i18n="watchVideoGet">Ver 1 video = 3 habilidades</p>
-                    <button id="loadSkillsBtn" class="btn-primary" data-i18n="loadSkills">Cargar Habilidades</button>
-                    <div class="skills-inventory">
-                        <div class="skill-item" data-skill="jetpack">🚀 Jetpack: <span>0</span></div>
-                        <div class="skill-item" data-skill="shield">🛹 Tabla: <span>0</span></div>
-                        <div class="skill-item" data-skill="magnet">🧲 Imán: <span>0</span></div>
-                        <div class="skill-item" data-skill="jump">⬆️ Super Salto: <span>0</span></div>
-                        <div class="skill-item" data-skill="speed">⚡ Velocidad: <span>0</span></div>
-                    </div>
-                </div>
-                <button id="startGameBtn" class="btn-start" data-i18n="run">¡CORRER!</button>
-            </div>
-            <canvas id="gameCanvas" class="game-canvas hidden"></canvas>
-            <div id="gameHUD" class="game-hud hidden">
-                <div class="hud-top">
-                    <div class="hearts">
-                        <span class="heart">❤️</span>
-                        <span class="heart">❤️</span>
-                        <span class="heart">❤️</span>
-                    </div>
-                    <div class="hud-coins"><span id="hudCoins">0</span> 🪙</div>
-                </div>
-                <div class="hud-bottom">
-                    <button id="pauseBtn" class="btn-pause">⏸️</button>
-                </div>
-            </div>
-            <div id="gameOverScreen" class="game-over-screen hidden">
-                <h2>💀 Game Over</h2>
-                <p><span data-i18n="coinsWon">Monedas ganadas</span>: <span id="finalCoins">0</span></p>
-                <button id="reviveBtn" class="btn-primary" data-i18n="revive">Revivir (Ver Video)</button>
-                <button id="doubleBtn" class="btn-primary" data-i18n="double">Multiplicar x2 (Ver Video)</button>
-                <button id="menuBtn" class="btn-secondary" data-i18n="backMenu">Volver al Menú</button>
-            </div>
-        </section>
-
-        <!-- PESTAÑA 4: RANKING -->
-        <section id="rankingTab" class="tab-content">
-            <h2 data-i18n="ranking">🏆 Tabla de Clasificación</h2>
-            <div class="player-stats">
-                <h3 data-i18n="yourBalance">Tu Saldo Total</h3>
-                <p class="big-number"><span id="totalBalance">0</span> <span data-i18n="coins">monedas</span></p>
-                <p><span data-i18n="currentLeague">Liga Actual</span>: <span id="currentLeague">Bronce</span></p>
-            </div>
-            <div class="leagues-list">
-                <h3 data-i18n="leagues">Ligas</h3>
-                <div class="league-item"><span class="league-icon">🥉</span><span class="league-name">Bronce</span><span class="league-req">500K</span></div>
-                <div class="league-item"><span class="league-icon">🥈</span><span class="league-name">Plata</span><span class="league-req">1M</span></div>
-                <div class="league-item"><span class="league-icon">🥇</span><span class="league-name">Oro</span><span class="league-req">5M</span></div>
-                <div class="league-item"><span class="league-icon">💎</span><span class="league-name">Diamante</span><span class="league-req">10M</span></div>
-                <div class="league-item"><span class="league-icon">💚</span><span class="league-name">Esmeralda</span><span class="league-req">20M</span></div>
-                <div class="league-item"><span class="league-icon">❤️</span><span class="league-name">Rubí</span><span class="league-req">35M</span></div>
-                <div class="league-item"><span class="league-icon">💙</span><span class="league-name">Zafiro</span><span class="league-req">50M</span></div>
-                <div class="league-item"><span class="league-icon">🔮</span><span class="league-name">Mítico</span><span class="league-req">85M</span></div>
-                <div class="league-item"><span class="league-icon">👻</span><span class="league-name">Inmortal</span><span class="league-req">95M</span></div>
-                <div class="league-item"><span class="league-icon">🌟</span><span class="league-name">Legendario</span><span class="league-req">100M</span></div>
-            </div>
-        </section>
-
-        <!-- PESTAÑA 5: BILLETERA -->
-        <section id="walletTab" class="tab-content">
-            <h2 data-i18n="wallet">💰 Billetera y Retiros</h2>
-            <div class="wallet-info">
-                <div class="settings-gear" id="langGear">⚙️</div>
-                <div class="lang-menu" id="langMenu">
-                    <div class="lang-option selected" data-lang="es">🇪🇸 Español</div>
-                    <div class="lang-option" data-lang="en">🇺🇸 English</div>
-                    <div class="lang-option" data-lang="ru">🇷🇺 Русский</div>
-                    <div class="lang-option" data-lang="zh">🇨🇳 中文</div>
-                </div>
-                <h3 data-i18n="yourWallet">Tu Billetera</h3>
-                <div class="wallet-address">
-                    <label data-i18n="linkedWallet">Wallet Vinculada:</label>
-                    <input type="text" id="walletAddress" placeholder="USDT/TON Wallet">
-                    <button id="saveWalletBtn" class="btn-small" data-i18n="save">Guardar</button>
-                </div>
-            </div>
-            <div class="withdrawal-policy">
-                <h3 data-i18n="withdrawPolicy">📋 Política de Retiros</h3>
-                <p class="policy-text" data-i18n="policyText">
-                    Cada 40 días se realiza la evaluación de puntos acumulados en tu balance de EleganceCoin.
-                    El reparto de dinero real en USDT se enviará directamente a tu Billetera de Telegram vinculada,
-                    proporcional a tu actividad y puntuación. Entre más juegues y subas en la tabla, mayor será
-                    tu recompensa en dólares reales. Sin inversiones, solo juega y gana.
-                </p>
-            </div>
-            <div class="withdrawal-buttons">
-                <h3 data-i18n="withdrawFunds" style="grid-column: 1/-1;">Retirar Fondos</h3>
-                <button class="btn-withdraw" data-amount="1">$1.00 USD</button>
-                <button class="btn-withdraw" data-amount="5">$5.00 USD</button>
-                <button class="btn-withdraw" data-amount="10">$10.00 USD</button>
-                <button class="btn-withdraw" data-amount="20">$20.00 USD</button>
-            </div>
-        </section>
-    </main>
-
-    <nav class="bottom-nav">
-        <button class="nav-btn active" data-tab="missionsTab">
-            <span class="nav-icon">🎯</span>
-            <span class="nav-text" data-i18n="navMissions">Misiones</span>
-        </button>
-        <button class="nav-btn" data-tab="wardrobeTab">
-            <span class="nav-icon">👗</span>
-            <span class="nav-text" data-i18n="navWardrobe">Vestidor</span>
-        </button>
-        <button class="nav-btn central" data-tab="gameTab">
-            <span class="nav-icon">🎮</span>
-            <span class="nav-text" data-i18n="navPlay">Jugar</span>
-        </button>
-        <button class="nav-btn" data-tab="rankingTab">
-            <span class="nav-icon">🏆</span>
-            <span class="nav-text" data-i18n="navRanking">Ranking</span>
-        </button>
-        <button class="nav-btn" data-tab="walletTab">
-            <span class="nav-icon">💰</span>
-            <span class="nav-text" data-i18n="navWallet">Wallet</span>
-        </button>
-    </nav>
-
-    <div id="bannerAdSpace" class="banner-ad-space">
-        <p class="placeholder-text">Banner Ad (Adsgram/Monlix)</p>
-    </div>
+<canvas id="gameCanvas"></canvas>
+<div class="game-hud" id="gameHud">
+<div class="hud-top"><div class="hearts" id="heartsD">❤️❤️❤️</div><div class="hud-coins" id="hudCoins">0 🪙</div></div>
+<div class="hud-score" id="hudScore">0m</div>
+</div>
+<div class="hud-bottom" id="hudBot" style="display:none"><button class="btn-pause" id="pauseBtn">⏸️</button></div>
+<div class="go-screen" id="goScreen">
+<h2>💀 GAME OVER</h2>
+<p>Monedas: <span id="finalC">0</span></p>
+<p style="font-size:16px;color:var(--d)">Distancia: <span id="finalD">0</span>m</p>
+<button id="revBtn" class="btn-p">Revivir (Video)</button>
+<button id="dblBtn" class="btn-p">x2 Monedas (Video)</button>
+<button id="menuBtn" class="btn-s">Menú</button>
 </div>
 
 <script>
-// ============================================
-// SISTEMA DE AUDIO COMPLETO
-// ============================================
-class AudioManager {
-    constructor() {
-        this.ctx = null;
-        this.musicPlaying = false;
-        this.musicNodes = [];
-        this.initialized = false;
-    }
+// ===== AUDIO =====
+class Audio{
+constructor(){this.c=null;this.mp=false;this.mn=[];this.ok=false}
+init(){if(this.ok)return;try{this.c=new(window.AudioContext||window.webkitAudioContext)();this.ok=true}catch(e){}}
+music(){if(!this.c||this.mp)return;this.mp=true;this._ml()}
+_ml(){if(!this.mp||!this.c)return;const n=this.c.currentTime;const m=[{f:220,d:.6},{f:261.63,d:.6},{f:293.66,d:.6},{f:329.63,d:.8},{f:293.66,d:.6},{f:261.63,d:.6},{f:246.94,d:.8},{f:220,d:1}];let t=n;m.forEach(o=>{const s=this.c.createOscillator(),g=this.c.createGain();s.type='sine';s.frequency.value=o.f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+o.d);s.connect(g);g.connect(this.c.destination);s.start(t);s.stop(t+o.d);this.mn.push(s);const s2=this.c.createOscillator(),g2=this.c.createGain();s2.type='triangle';s2.frequency.value=o.f*2;g2.gain.setValueAtTime(0,t);g2.gain.linearRampToValueAtTime(.012,t+.05);g2.gain.exponentialRampToValueAtTime(.001,t+o.d);s2.connect(g2);g2.connect(this.c.destination);s2.start(t);s2.stop(t+o.d);this.mn.push(s2);t+=o.d});const b=this.c.createOscillator(),bg=this.c.createGain();b.type='sine';b.frequency.value=55;bg.gain.setValueAtTime(.05,n);bg.gain.exponentialRampToValueAtTime(.001,n+5);b.connect(bg);bg.connect(this.c.destination);b.start(n);b.stop(n+5);this.mn.push(b);setTimeout(()=>this._ml(),5000)}
+stopM(){this.mp=false;this.mn.forEach(n=>{try{n.stop()}catch(e){}});this.mn=[]}
+coin(){if(!this.c)return;const n=this.c.currentTime;[1318,1568,2093].forEach((f,i)=>{const o=this.c.createOscillator(),g=this.c.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,n+i*.03);g.gain.linearRampToValueAtTime(.12,n+i*.03+.01);g.gain.exponentialRampToValueAtTime(.001,n+.25);o.connect(g);g.connect(this.c.destination);o.start(n+i*.03);o.stop(n+.25)})}
+jet(){if(!this.c)return;const n=this.c.currentTime,o=this.c.createOscillator(),g=this.c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(150,n);o.frequency.exponentialRampToValueAtTime(600,n+.5);g.gain.setValueAtTime(.12,n);g.gain.exponentialRampToValueAtTime(.001,n+.6);o.connect(g);g.connect(this.c.destination);o.start(n);o.stop(n+.6)}
+shield(){if(!this.c)return;const n=this.c.currentTime;[440,554,659].forEach((f,i)=>{const o=this.c.createOscillator(),g=this.c.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(0,n+i*.05);g.gain.linearRampToValueAtTime(.08,n+i*.05+.01);g.gain.exponentialRampToValueAtTime(.001,n+.35);o.connect(g);g.connect(this.c.destination);o.start(n+i*.05);o.stop(n+.35)})}
+magnet(){if(!this.c)return;const n=this.c.currentTime,o=this.c.createOscillator(),g=this.c.createGain();o.type='sine';o.frequency.setValueAtTime(200,n);o.frequency.linearRampToValueAtTime(800,n+.3);o.frequency.linearRampToValueAtTime(200,n+.6);g.gain.setValueAtTime(.1,n);g.gain.exponentialRampToValueAtTime(.001,n+.6);o.connect(g);g.connect(this.c.destination);o.start(n);o.stop(n+.6)}
+jump(){if(!this.c)return;const n=this.c.currentTime,o=this.c.createOscillator(),g=this.c.createGain();o.type='sine';o.frequency.setValueAtTime(300,n);o.frequency.exponentialRampToValueAtTime(1200,n+.2);g.gain.setValueAtTime(.12,n);g.gain.exponentialRampToValueAtTime(.001,n+.25);o.connect(g);g.connect(this.c.destination);o.start(n);o.stop(n+.25)}
+speed(){if(!this.c)return;const n=this.c.currentTime;for(let i=0;i<5;i++){const o=this.c.createOscillator(),g=this.c.createGain();o.type='sawtooth';o.frequency.value=400+i*100;g.gain.setValueAtTime(0,n+i*.05);g.gain.linearRampToValueAtTime(.06,n+i*.05+.02);g.gain.exponentialRampToValueAtTime(.001,n+i*.05+.12);o.connect(g);g.connect(this.c.destination);o.start(n+i*.05);o.stop(n+i*.05+.12)}}
+hit(){if(!this.c)return;const n=this.c.currentTime,o=this.c.createOscillator(),g=this.c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(150,n);o.frequency.exponentialRampToValueAtTime(40,n+.3);g.gain.setValueAtTime(.2,n);g.gain.exponentialRampToValueAtTime(.001,n+.3);o.connect(g);g.connect(this.c.destination);o.start(n);o.stop(n+.3)}
+}
+const au=new Audio();
 
-    init() {
-        if (this.initialized) return;
-        try {
-            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            this.initialized = true;
-        } catch(e) { console.log('Audio no soportado'); }
-    }
-
-    // Música Halloween melódica (suave, en loop)
-    startHalloweenMusic() {
-        if (!this.ctx || this.musicPlaying) return;
-        this.musicPlaying = true;
-        this.playMusicLoop();
-    }
-
-    playMusicLoop() {
-        if (!this.musicPlaying || !this.ctx) return;
-        const now = this.ctx.currentTime;
-        // Escala menor melódica - tono tenebroso pero melódico
-        const melody = [
-            {f: 220.00, d: 0.6}, // A3
-            {f: 261.63, d: 0.6}, // C4
-            {f: 293.66, d: 0.6}, // D4
-            {f: 329.63, d: 0.8}, // E4
-            {f: 293.66, d: 0.6}, // D4
-            {f: 261.63, d: 0.6}, // C4
-            {f: 246.94, d: 0.8}, // B3
-            {f: 220.00, d: 1.0}  // A3
-        ];
-        let t = now;
-        melody.forEach(note => {
-            // Oscilador principal (flauta suave)
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = note.f;
-            gain.gain.setValueAtTime(0, t);
-            gain.gain.linearRampToValueAtTime(0.04, t + 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + note.d);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(t);
-            osc.stop(t + note.d);
-            this.musicNodes.push(osc);
-
-            // Armónico suave (octava arriba)
-            const osc2 = this.ctx.createOscillator();
-            const gain2 = this.ctx.createGain();
-            osc2.type = 'triangle';
-            osc2.frequency.value = note.f * 2;
-            gain2.gain.setValueAtTime(0, t);
-            gain2.gain.linearRampToValueAtTime(0.015, t + 0.05);
-            gain2.gain.exponentialRampToValueAtTime(0.001, t + note.d);
-            osc2.connect(gain2);
-            gain2.connect(this.ctx.destination);
-            osc2.start(t);
-            osc2.stop(t + note.d);
-            this.musicNodes.push(osc2);
-
-            t += note.d;
-        });
-        // Bajo profundo
-        const bass = this.ctx.createOscillator();
-        const bassGain = this.ctx.createGain();
-        bass.type = 'sine';
-        bass.frequency.value = 55; // A1
-        bassGain.gain.setValueAtTime(0.06, now);
-        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 5);
-        bass.connect(bassGain);
-        bassGain.connect(this.ctx.destination);
-        bass.start(now);
-        bass.stop(now + 5);
-        this.musicNodes.push(bass);
-
-        setTimeout(() => this.playMusicLoop(), 5000);
-    }
-
-    stopMusic() {
-        this.musicPlaying = false;
-        this.musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
-        this.musicNodes = [];
-    }
-
-    // Sonido de moneda (ding cristalino)
-    playCoinSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        [1318.51, 1567.98, 2093.00].forEach((freq, i) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0, now + i*0.03);
-            gain.gain.linearRampToValueAtTime(0.15, now + i*0.03 + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now + i*0.03);
-            osc.stop(now + 0.3);
-        });
-    }
-
-    // Sonido Jetpack (propulsión)
-    playJetpackSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(600, now + 0.5);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.6);
-    }
-
-    // Sonido Tabla/Escudo (metálico protector)
-    playShieldSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        [440, 554.37, 659.25].forEach((freq, i) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0, now + i*0.05);
-            gain.gain.linearRampToValueAtTime(0.1, now + i*0.05 + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now + i*0.05);
-            osc.stop(now + 0.4);
-        });
-    }
-
-    // Sonido Imán (magnético)
-    playMagnetSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.linearRampToValueAtTime(800, now + 0.3);
-        osc.frequency.linearRampToValueAtTime(200, now + 0.6);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.6);
-    }
-
-    // Sonido Super Salto
-    playJumpSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.3);
-    }
-
-    // Sonido Velocidad (turbo)
-    playSpeedSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        for (let i = 0; i < 5; i++) {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.value = 400 + i*100;
-            gain.gain.setValueAtTime(0, now + i*0.05);
-            gain.gain.linearRampToValueAtTime(0.08, now + i*0.05 + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.05 + 0.15);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now + i*0.05);
-            osc.stop(now + i*0.05 + 0.15);
-        }
-    }
-
-    // Sonido de colisión
-    playHitSound() {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.3);
-    }
+// ===== STATE =====
+const GS={coins:0,char:'boy',day:1,vids:0,skills:{jetpack:0,shield:0,magnet:0,jump:0,speed:0},wallet:'',lives:3,rc:0};
+function loadGS(){try{const s=localStorage.getItem('egs');if(s)Object.assign(GS,JSON.parse(s))}catch(e){}updUI()}
+function saveGS(){localStorage.setItem('egs',JSON.stringify(GS))}
+function fmtN(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n+''}
+function updUI(){
+document.getElementById('coinBal').textContent=fmtN(GS.coins);
+document.getElementById('cDay').textContent=GS.day;
+document.getElementById('dRew').textContent=fmtN(GS.day*1000);
+document.getElementById('vWatch').textContent=GS.vids;
+document.getElementById('totBal').textContent=fmtN(GS.coins);
+document.getElementById('wAddr').value=GS.wallet;
+Object.keys(GS.skills).forEach(k=>{const e=document.querySelector(`[data-sk="${k}"] span`);if(e)e.textContent=GS.skills[k]});
+const lgs=[{n:'Bronce',r:5e5},{n:'Plata',r:1e6},{n:'Oro',r:5e6},{n:'Diamante',r:1e7},{n:'Esmeralda',r:2e7},{n:'Rubí',r:3.5e7},{n:'Zafiro',r:5e7},{n:'Mítico',r:8.5e7},{n:'Inmortal',r:9.5e7},{n:'Legendario',r:1e8}];
+let cl='Bronce';for(const l of lgs)if(GS.coins>=l.r)cl=l.n;
+document.getElementById('curLg').textContent=cl;
+document.querySelectorAll('.lg-it').forEach(i=>{i.classList.toggle('cur',i.textContent.includes(cl))});
 }
 
-const audio = new AudioManager();
+// ===== LANG =====
+document.getElementById('langGear').onclick=e=>{e.stopPropagation();document.getElementById('langMenu').classList.toggle('active')};
+document.querySelectorAll('.lang-o').forEach(o=>o.onclick=()=>{document.querySelectorAll('.lang-o').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');document.getElementById('langMenu').classList.remove('active')});
+document.addEventListener('click',()=>document.getElementById('langMenu').classList.remove('active'));
 
-// ============================================
-// SISTEMA DE IDIOMAS (4 idiomas)
-// ============================================
-const translations = {
-    es: {
-        missions: "🎯 Misiones y Tareas",
-        dailyReward: "📅 Recompensa Diaria",
-        day: "Día",
-        coins: "monedas",
-        claimVideo: "Reclamar (Ver Video)",
-        marathon: "🎬 Maratón de Anuncios",
-        marathonDesc: "Ve hasta 20 videos diarios",
-        reward: "Recompensa",
-        watchNow: "Ver Video Ahora",
-        videosToday: "Videos vistos hoy",
-        invite: "👥 Invitar Amigos",
-        inviteDesc: "Gana 5,000 monedas por cada amigo",
-        copyLink: "Copiar Link de Referido",
-        externalTasks: "🔗 Tareas Externas",
-        telegramTasks: "📱 Tareas de Telegram",
-        wardrobe: "👗 Vestidor y Tienda",
-        selectChar: "Selecciona Personaje",
-        boySkull: "Chico Calavera",
-        girlSkull: "Chica Calavera",
-        shoes: "👟 Calzado (10 videos)",
-        hats: "🧢 Gorras (20 videos)",
-        shirts: "👕 Camisetas (30 videos)",
-        pants: "👖 Pantalones (40 videos)",
-        outfits: "🎭 Trajes (50 videos)",
-        boards: "🛹 Tablas (50 videos)",
-        preRaceSkills: "🚀 Habilidades Pre-Carrera",
-        watchVideoGet: "Ver 1 video = 3 habilidades",
-        loadSkills: "Cargar Habilidades",
-        run: "¡CORRER!",
-        coinsWon: "Monedas ganadas",
-        revive: "Revivir (Ver Video)",
-        double: "Multiplicar x2 (Ver Video)",
-        backMenu: "Volver al Menú",
-        ranking: "🏆 Tabla de Clasificación",
-        yourBalance: "Tu Saldo Total",
-        currentLeague: "Liga Actual",
-        leagues: "Ligas",
-        wallet: "💰 Billetera y Retiros",
-        yourWallet: "Tu Billetera",
-        linkedWallet: "Wallet Vinculada:",
-        save: "Guardar",
-        withdrawPolicy: "📋 Política de Retiros",
-        policyText: "Cada 40 días se realiza la evaluación de puntos acumulados en tu balance de EleganceCoin. El reparto de dinero real en USDT se enviará directamente a tu Billetera de Telegram vinculada, proporcional a tu actividad y puntuación. Entre más juegues y subas en la tabla, mayor será tu recompensa en dólares reales. Sin inversiones, solo juega y gana.",
-        withdrawFunds: "Retirar Fondos",
-        navMissions: "Misiones",
-        navWardrobe: "Vestidor",
-        navPlay: "Jugar",
-        navRanking: "Ranking",
-        navWallet: "Wallet"
-    },
-    en: {
-        missions: "🎯 Missions & Tasks",
-        dailyReward: "📅 Daily Reward",
-        day: "Day",
-        coins: "coins",
-        claimVideo: "Claim (Watch Video)",
-        marathon: "🎬 Ad Marathon",
-        marathonDesc: "Watch up to 20 videos daily",
-        reward: "Reward",
-        watchNow: "Watch Video Now",
-        videosToday: "Videos watched today",
-        invite: "👥 Invite Friends",
-        inviteDesc: "Earn 5,000 coins per friend",
-        copyLink: "Copy Referral Link",
-        externalTasks: "🔗 External Tasks",
-        telegramTasks: "📱 Telegram Tasks",
-        wardrobe: "👗 Wardrobe & Shop",
-        selectChar: "Select Character",
-        boySkull: "Skull Boy",
-        girlSkull: "Skull Girl",
-        shoes: "👟 Shoes (10 videos)",
-        hats: "🧢 Hats (20 videos)",
-        shirts: "👕 Shirts (30 videos)",
-        pants: "👖 Pants (40 videos)",
-        outfits: "🎭 Outfits (50 videos)",
-        boards: "🛹 Boards (50 videos)",
-        preRaceSkills: "🚀 Pre-Race Skills",
-        watchVideoGet: "Watch 1 video = 3 skills",
-        loadSkills: "Load Skills",
-        run: "RUN!",
-        coinsWon: "Coins won",
-        revive: "Revive (Watch Video)",
-        double: "Double x2 (Watch Video)",
-        backMenu: "Back to Menu",
-        ranking: "🏆 Leaderboard",
-        yourBalance: "Your Total Balance",
-        currentLeague: "Current League",
-        leagues: "Leagues",
-        wallet: "💰 Wallet & Withdrawals",
-        yourWallet: "Your Wallet",
-        linkedWallet: "Linked Wallet:",
-        save: "Save",
-        withdrawPolicy: "📋 Withdrawal Policy",
-        policyText: "Every 40 days, accumulated points in your EleganceCoin balance are evaluated. Real money in USDT will be sent directly to your linked Telegram Wallet, proportional to your activity and score. The more you play and climb the leaderboard, the greater your reward in real dollars. No investments, just play and win.",
-        withdrawFunds: "Withdraw Funds",
-        navMissions: "Missions",
-        navWardrobe: "Wardrobe",
-        navPlay: "Play",
-        navRanking: "Ranking",
-        navWallet: "Wallet"
-    },
-    ru: {
-        missions: "🎯 Миссии и Задания",
-        dailyReward: "📅 Ежедневная Награда",
-        day: "День",
-        coins: "монет",
-        claimVideo: "Получить (Смотреть Видео)",
-        marathon: "🎬 Марафон Рекламы",
-        marathonDesc: "Смотрите до 20 видео в день",
-        reward: "Награда",
-        watchNow: "Смотреть Сейчас",
-        videosToday: "Просмотрено сегодня",
-        invite: "👥 Пригласить Друзей",
-        inviteDesc: "Получите 5,000 монет за друга",
-        copyLink: "Копировать Ссылку",
-        externalTasks: "🔗 Внешние Задания",
-        telegramTasks: "📱 Задания Telegram",
-        wardrobe: "👗 Гардероб и Магазин",
-        selectChar: "Выберите Персонажа",
-        boySkull: "Парень Череп",
-        girlSkull: "Девушка Череп",
-        shoes: "👟 Обувь (10 видео)",
-        hats: "🧢 Шапки (20 видео)",
-        shirts: "👕 Рубашки (30 видео)",
-        pants: "👖 Штаны (40 видео)",
-        outfits: "🎭 Костюмы (50 видео)",
-        boards: "🛹 Доски (50 видео)",
-        preRaceSkills: "🚀 Навыки Перед Забегом",
-        watchVideoGet: "1 видео = 3 навыка",
-        loadSkills: "Загрузить Навыки",
-        run: "БЕЖАТЬ!",
-        coinsWon: "Заработано монет",
-        revive: "Возродиться (Видео)",
-        double: "Удвоить x2 (Видео)",
-        backMenu: "В Меню",
-        ranking: "🏆 Таблица Лидеров",
-        yourBalance: "Ваш Баланс",
-        currentLeague: "Текущая Лига",
-        leagues: "Лиги",
-        wallet: "💰 Кошелёк и Вывод",
-        yourWallet: "Ваш Кошелёк",
-        linkedWallet: "Привязанный Кошелёк:",
-        save: "Сохранить",
-        withdrawPolicy: "📋 Политика Вывода",
-        policyText: "Каждые 40 дней оцениваются накопленные баллы в вашем балансе EleganceCoin. Реальные деньги в USDT будут отправлены напрямую в ваш привязанный кошелёк Telegram, пропорционально вашей активности и счёту. Чем больше играете и поднимаетесь в таблице, тем больше награда в реальных долларах. Без вложений, просто играйте и выигрывайте.",
-        withdrawFunds: "Вывести Средства",
-        navMissions: "Миссии",
-        navWardrobe: "Гардероб",
-        navPlay: "Играть",
-        navRanking: "Рейтинг",
-        navWallet: "Кошелёк"
-    },
-    zh: {
-        missions: "🎯 任务与活动",
-        dailyReward: "📅 每日奖励",
-        day: "天",
-        coins: "金币",
-        claimVideo: "领取(观看视频)",
-        marathon: "🎬 广告马拉松",
-        marathonDesc: "每日最多观看20个视频",
-        reward: "奖励",
-        watchNow: "立即观看",
-        videosToday: "今日已观看",
-        invite: "👥 邀请好友",
-        inviteDesc: "每位好友获得5,000金币",
-        copyLink: "复制推荐链接",
-        externalTasks: "🔗 外部任务",
-        telegramTasks: "📱 Telegram任务",
-        wardrobe: "👗 衣橱与商店",
-        selectChar: "选择角色",
-        boySkull: "骷髅男孩",
-        girlSkull: "骷髅女孩",
-        shoes: "👟 鞋子(10视频)",
-        hats: "🧢 帽子(20视频)",
-        shirts: "👕 衬衫(30视频)",
-        pants: "👖 裤子(40视频)",
-        outfits: "🎭 套装(50视频)",
-        boards: "🛹 滑板(50视频)",
-        preRaceSkills: "🚀 赛前技能",
-        watchVideoGet: "观看1视频 = 3技能",
-        loadSkills: "加载技能",
-        run: "开跑!",
-        coinsWon: "获得金币",
-        revive: "复活(观看视频)",
-        double: "翻倍x2(观看视频)",
-        backMenu: "返回菜单",
-        ranking: "🏆 排行榜",
-        yourBalance: "您的总余额",
-        currentLeague: "当前联赛",
-        leagues: "联赛",
-        wallet: "💰 钱包与提现",
-        yourWallet: "您的钱包",
-        linkedWallet: "绑定钱包:",
-        save: "保存",
-        withdrawPolicy: "📋 提现政策",
-        policyText: "每40天评估一次您EleganceCoin余额中累积的积分。真实USDT资金将直接发送到您绑定的Telegram钱包,与您的活动和得分成正比。您玩得越多,排名越高,获得的真实美元奖励就越多。无需投资,只需玩和赢。",
-        withdrawFunds: "提现资金",
-        navMissions: "任务",
-        navWardrobe: "衣橱",
-        navPlay: "游戏",
-        navRanking: "排行",
-        navWallet: "钱包"
-    }
-};
+// ===== NAV =====
+document.querySelectorAll('.nav-b').forEach(b=>b.onclick=()=>{
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.getElementById(b.dataset.tab).classList.add('active');
+document.querySelectorAll('.nav-b').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');
+if(b.dataset.tab==='gameTab'){au.init();au.music()}else au.stopM();
+});
 
-let currentLang = 'es';
+// ===== CHARS =====
+document.querySelectorAll('.char-c').forEach(c=>c.onclick=()=>{
+document.querySelectorAll('.char-c').forEach(x=>x.classList.remove('sel'));
+c.classList.add('sel');GS.char=c.dataset.ch;
+document.getElementById('selAv').className='av-lg '+(GS.char==='boy'?'boy-sk':'girl-sk');saveGS()});
 
-function applyLanguage(lang) {
-    currentLang = lang;
-    const dict = translations[lang];
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.textContent = dict[key];
-    });
-    document.querySelectorAll('.lang-option').forEach(opt => {
-        opt.classList.toggle('selected', opt.dataset.lang === lang);
-    });
-    localStorage.setItem('eleganceLang', lang);
+// ===== MISSIONS =====
+function showAd(cb){au.init();setTimeout(()=>{if(cb)cb()},400)}
+document.getElementById('claimBtn').onclick=()=>showAd(()=>{GS.coins+=GS.day*1000;GS.day++;updUI();saveGS();au.coin()});
+document.getElementById('marBtn').onclick=()=>{if(GS.vids>=20)return;showAd(()=>{GS.coins+=500;GS.vids++;updUI();saveGS();au.coin()})};
+document.getElementById('invBtn').onclick=()=>{try{navigator.clipboard.writeText('https://t.me/YourBot?start=ref_'+Date.now())}catch(e){}};
+document.getElementById('loadSkBtn').onclick=()=>showAd(()=>{GS.skills.jetpack++;GS.skills.shield++;GS.skills.magnet++;updUI();saveGS();au.jet()});
+document.getElementById('saveWBtn').onclick=()=>{GS.wallet=document.getElementById('wAddr').value.trim();saveGS()};
+document.querySelectorAll('.btn-w').forEach(b=>b.onclick=()=>{if(!GS.wallet)return;});
+
+// ===== COINS RAIN =====
+(function(){const c=document.getElementById('cRain');for(let i=0;i<12;i++){const d=document.createElement('div');d.className='coin3d';d.style.left=Math.random()*100+'%';d.style.animationDelay=Math.random()*4+'s';d.style.animationDuration=(3+Math.random()*2)+'s';c.appendChild(d)}})();
+
+// ===== START =====
+setTimeout(()=>{document.getElementById('loadScr').style.display='none';document.getElementById('startScr').classList.add('active')},2800);
+document.getElementById('startBtn').onclick=()=>{au.init();au.music();document.getElementById('startScr').classList.remove('active');document.getElementById('mainC').classList.remove('hidden')};
+
+// =============================================
+// JUEGO 3D RUNNER TIPO SUBWAY SURFERS
+// =============================================
+const cv=document.getElementById('gameCanvas');
+const cx=cv.getContext('2d');
+let W,H,playing=false,lives=3,rCoins=0,dist=0,speed=0,animId=null;
+let pLane=1,pTargetLane=1,pX=0,pJump=0,pJumpV=0,pSlide=0,pSlideT=0;
+let obstacles=[],coinArr=[],particles=[],buildings=[];
+let legAnim=0,shakeT=0,invincible=0;
+const LANE_W=1.8,ROAD_W=6,FL=200,CAM_H=2.5;
+const COLORS={sky1:'#0a0015',sky2:'#1a0a2e',ground:'#1a1a1a',road:'#2a2a2a',line:'#ff6b00',wall:'#333'};
+
+function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+window.addEventListener('resize',resize);
+
+function project(x,y,z){
+if(z<=0.1)z=0.1;
+const sx=W/2+(x*FL)/z;
+const sy=H*0.65-((y-CAM_H)*FL)/z;
+const sc=FL/z;
+return{x:sx,y:sy,s:sc}
 }
 
-// ============================================
-// ESTADO DEL JUEGO
-// ============================================
-const gameState = {
-    coins: 0, selectedCharacter: 'boy', currentDay: 1,
-    videosWatchedToday: 0,
-    skills: { jetpack: 0, shield: 0, magnet: 0, jump: 0, speed: 0 },
-    walletAddress: '', isPlaying: false, lives: 3, currentCoins: 0
-};
-
-function loadGameState() {
-    const saved = localStorage.getItem('eleganceGamerState');
-    if (saved) {
-        try {
-            Object.assign(gameState, JSON.parse(saved));
-            updateUI();
-        } catch(e) {}
-    }
-    const savedLang = localStorage.getItem('eleganceLang');
-    if (savedLang && translations[savedLang]) applyLanguage(savedLang);
+function initBuildings(){
+buildings=[];
+for(let i=0;i<30;i++){
+const side=i%2===0?-1:1;
+buildings.push({
+x:side*(ROAD_W/2+1+Math.random()*3),
+z:20+i*15+Math.random()*10,
+w:1.5+Math.random()*2,
+h:3+Math.random()*8,
+color:`hsl(${260+Math.random()*40},${20+Math.random()*20}%,${8+Math.random()*12}%)`,
+windows:Math.floor(Math.random()*5)+2
+});
+}
 }
 
-function saveGameState() {
-    localStorage.setItem('eleganceGamerState', JSON.stringify(gameState));
+function spawnObs(){
+const lane=Math.floor(Math.random()*3)-1;
+const types=['barrier','train','pumpkin'];
+const type=types[Math.floor(Math.random()*types.length)];
+obstacles.push({lane,x:lane*LANE_W,z:120,type,w:type==='train'?1.6:1.2,h:type==='train'?2.5:1.2,passed:false});
 }
 
-function updateUI() {
-    document.getElementById('coinBalance').textContent = formatNumber(gameState.coins);
-    document.getElementById('currentDay').textContent = gameState.currentDay;
-    document.getElementById('dailyReward').textContent = formatNumber(gameState.currentDay * 1000);
-    document.getElementById('videosWatched').textContent = gameState.videosWatchedToday;
-    document.getElementById('totalBalance').textContent = formatNumber(gameState.coins);
-    document.getElementById('walletAddress').value = gameState.walletAddress;
-    Object.keys(gameState.skills).forEach(skill => {
-        const el = document.querySelector(`[data-skill="${skill}"] span`);
-        if (el) el.textContent = gameState.skills[skill];
-    });
-    updateCurrentLeague();
+function spawnCoins(){
+const lane=Math.floor(Math.random()*3)-1;
+const count=3+Math.floor(Math.random()*4);
+for(let i=0;i<count;i++){
+coinArr.push({x:lane*LANE_W,z:100+i*4,y:1+Math.sin(i*.5)*.5,collected:false});
+}
 }
 
-function formatNumber(num) {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
+function addParticles(x,y,color,count){
+for(let i=0;i<count;i++){
+particles.push({x,y,vx:(Math.random()-.5)*8,vy:-Math.random()*6-2,life:1,color,size:2+Math.random()*3});
+}
 }
 
-function updateCurrentLeague() {
-    const leagues = [
-        {name:'Bronce', req:500000}, {name:'Plata', req:1000000},
-        {name:'Oro', req:5000000}, {name:'Diamante', req:10000000},
-        {name:'Esmeralda', req:20000000}, {name:'Rubí', req:35000000},
-        {name:'Zafiro', req:50000000}, {name:'Mítico', req:85000000},
-        {name:'Inmortal', req:95000000}, {name:'Legendario', req:100000000}
-    ];
-    let current = 'Bronce';
-    for (let l of leagues) if (gameState.coins >= l.req) current = l.name;
-    document.getElementById('currentLeague').textContent = current;
-    document.querySelectorAll('.league-item').forEach(item => {
-        item.classList.remove('current');
-        if (item.textContent.includes(current)) item.classList.add('current');
-    });
+function drawSky(){
+const grd=cx.createLinearGradient(0,0,0,H*.65);
+grd.addColorStop(0,COLORS.sky1);
+grd.addColorStop(1,COLORS.sky2);
+cx.fillStyle=grd;
+cx.fillRect(0,0,W,H*.65);
+// Luna
+cx.fillStyle='#ffe4b5';
+cx.beginPath();cx.arc(W*.8,H*.12,25,0,Math.PI*2);cx.fill();
+cx.fillStyle=COLORS.sky1;
+cx.beginPath();cx.arc(W*.8+8,H*.12-5,22,0,Math.PI*2);cx.fill();
+// Estrellas
+cx.fillStyle='#fff';
+for(let i=0;i<30;i++){
+const sx=(i*137.5)%W,sy=(i*97.3)%(.5*H);
+const sz=.5+Math.sin(Date.now()*.003+i)*.5;
+cx.globalAlpha=.3+sz*.5;
+cx.fillRect(sx,sy,1.5,1.5);
+}
+cx.globalAlpha=1;
 }
 
-// ============================================
-// PANTALLA DE CARGA Y START
-// ============================================
-function createCoinsRain() {
-    const container = document.getElementById('coinsRain');
-    for (let i = 0; i < 15; i++) {
-        const coin = document.createElement('div');
-        coin.className = 'coin-3d';
-        coin.style.left = Math.random() * 100 + '%';
-        coin.style.animationDelay = Math.random() * 4 + 's';
-        coin.style.animationDuration = (3 + Math.random() * 2) + 's';
-        container.appendChild(coin);
-    }
+function drawGround(){
+// Suelo con perspectiva
+const horizon=H*.65;
+for(let y=horizon;y<H;y++){
+const t=(y-horizon)/(H-horizon);
+const z=FL/(y-horizon+1)*5;
+const brightness=Math.floor(15+t*15);
+cx.fillStyle=`rgb(${brightness},${brightness},${brightness+5})`;
+cx.fillRect(0,y,W,1);
+}
+// Líneas de carril
+for(let i=-1;i<=1;i++){
+const lx=i*LANE_W;
+cx.strokeStyle='rgba(255,107,0,0.3)';
+cx.lineWidth=1;
+cx.beginPath();
+for(let z=2;z<120;z+=2){
+const p=project(lx,0,z);
+if(z===2)cx.moveTo(p.x,p.y);else cx.lineTo(p.x,p.y);
+}
+cx.stroke();
+}
+// Bordes de carretera
+for(let side of[-1,1]){
+const bx=side*ROAD_W/2;
+cx.strokeStyle='rgba(255,107,0,0.6)';
+cx.lineWidth=2;
+cx.beginPath();
+for(let z=2;z<120;z+=2){
+const p=project(bx,0,z);
+if(z===2)cx.moveTo(p.x,p.y);else cx.lineTo(p.x,p.y);
+}
+cx.stroke();
+}
+// Líneas del suelo (velocidad)
+for(let z=5;z<100;z+=8){
+const zz=((z-dist*.5)%100+100)%100+2;
+const p1=project(-ROAD_W/2,0,zz);
+const p2=project(ROAD_W/2,0,zz);
+cx.strokeStyle=`rgba(255,107,0,${Math.max(0,.3-zz/300)})`;
+cx.lineWidth=1;
+cx.beginPath();cx.moveTo(p1.x,p1.y);cx.lineTo(p2.x,p2.y);cx.stroke();
+}
 }
 
-function showStartScreen() {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('startScreen').classList.add('active');
+function drawBuildings(){
+buildings.sort((a,b)=>b.z-a.z);
+buildings.forEach(b=>{
+const bz=((b.z-dist*.3)%450+450)%450+5;
+const p=project(b.x,0,bz);
+const pTop=project(b.x,b.h,bz);
+const bw=b.w*p.s;
+const bh=p.y-pTop.y;
+if(bw<1||bh<1)return;
+cx.fillStyle=b.color;
+cx.fillRect(p.x-bw/2,pTop.y,bw,bh);
+// Ventanas
+const wRows=b.windows;
+const wCols=Math.max(1,Math.floor(bw/8));
+for(let r=0;r<wRows;r++){
+for(let c=0;c<wCols;c++){
+const wx=p.x-bw/2+(c+.5)*(bw/wCols);
+const wy=pTop.y+(r+.5)*(bh/wRows);
+const ws=Math.max(1,bw/wCols*.4);
+cx.fillStyle=Math.random()>.3?'rgba(255,200,50,0.6)':'rgba(100,100,100,0.3)';
+cx.fillRect(wx-ws/2,wy-ws/2,ws,ws);
+}}
+});
 }
 
-document.getElementById('startAppBtn').addEventListener('click', () => {
-    audio.init();
-    audio.startHalloweenMusic();
-    document.getElementById('startScreen').classList.remove('active');
-    document.getElementById('mainContainer').classList.remove('hidden');
-});
-
-// ============================================
-// NAVEGACIÓN
-// ============================================
-document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tabId = btn.dataset.tab;
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if (tabId === 'gameTab') {
-            audio.init();
-            audio.startHalloweenMusic();
-        } else {
-            audio.stopMusic();
-        }
-    });
-});
-
-// ============================================
-// SELECTOR DE PERSONAJE
-// ============================================
-document.querySelectorAll('.character-card').forEach(card => {
-    card.addEventListener('click', () => {
-        document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        gameState.selectedCharacter = card.dataset.character;
-        document.getElementById('selectedAvatar').className = `avatar-large ${gameState.selectedCharacter}-skull`;
-        saveGameState();
-    });
-});
-
-// ============================================
-// IDIOMAS (TUERCA)
-// ============================================
-document.getElementById('langGear').addEventListener('click', (e) => {
-    e.stopPropagation();
-    document.getElementById('langMenu').classList.toggle('active');
-});
-document.querySelectorAll('.lang-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-        applyLanguage(opt.dataset.lang);
-        document.getElementById('langMenu').classList.remove('active');
-    });
-});
-document.addEventListener('click', () => {
-    document.getElementById('langMenu').classList.remove('active');
-});
-
-// ============================================
-// MISISIONES
-// ============================================
-function showRewardedAd(callback) {
-    audio.init();
-    // Simulación - En producción se integra Adsgram UnitID 52617
-    const tg = window.Telegram?.WebApp;
-    if (tg && tg.showAlert) {
-        tg.showAlert('🎬 Viendo anuncio de 30s...\n(Simulación - Integrar Adsgram UnitID 52617)');
-    }
-    setTimeout(() => { if (callback) callback(); }, 500);
+function drawPlayer(){
+const targetX=pTargetLane*LANE_W;
+pX+=(targetX-pX)*.15;
+const pz=5;
+const jumpY=pJump;
+const slideScale=pSlide>0?.5:1;
+const p=project(pX,jumpY+.5,pz);
+const sc=p.s*1.2;
+const bodyH=40*sc*slideScale;
+const bodyW=20*sc;
+const headR=12*sc;
+// Sombra
+const shP=project(pX,0,pz);
+cx.fillStyle='rgba(0,0,0,0.4)';
+cx.beginPath();cx.ellipse(shP.x,shP.y,bodyW*.8,4*sc,0,0,Math.PI*2);cx.fill();
+// Piernas
+legAnim+=speed*.15;
+const legSwing=Math.sin(legAnim)*8*sc*(pSlide>0?0:1);
+cx.fillStyle='#222';
+cx.fillRect(p.x-bodyW*.3+legSwing,p.y-bodyH*.1,bodyW*.25,bodyH*.4);
+cx.fillRect(p.x+bodyW*.05-legSwing,p.y-bodyH*.1,bodyW*.25,bodyH*.4);
+// Tenis
+cx.fillStyle='#111';
+cx.fillRect(p.x-bodyW*.35+legSwing,p.y+bodyH*.25,bodyW*.35,6*sc);
+cx.fillRect(p.x+bodyW*.0-legSwing,p.y+bodyH*.25,bodyW*.35,6*sc);
+// Cuerpo
+const isBoy=GS.char==='boy';
+cx.fillStyle=isBoy?'#111':'#222';
+cx.fillRect(p.x-bodyW/2,p.y-bodyH,bodyW,bodyH*.9);
+// Texto EleganceCoin en espalda
+cx.fillStyle=isBoy?'#0f0':'#8b00ff';
+cx.font=`bold ${Math.max(6,8*sc)}px monospace`;
+cx.textAlign='center';
+cx.fillText('EC',p.x,p.y-bodyH*.4);
+// Cabeza (calavera)
+const headY=p.y-bodyH-headR;
+cx.fillStyle='#ddd';
+cx.beginPath();cx.arc(p.x,headY,headR,0,Math.PI*2);cx.fill();
+// Ojos brillantes
+const eyeColor=isBoy?'#0f0':'#8b00ff';
+cx.fillStyle=eyeColor;
+cx.shadowColor=eyeColor;cx.shadowBlur=10*sc;
+cx.beginPath();cx.arc(p.x-headR*.3,headY-headR*.1,headR*.2,0,Math.PI*2);cx.fill();
+cx.beginPath();cx.arc(p.x+headR*.3,headY-headR*.1,headR*.2,0,Math.PI*2);cx.fill();
+cx.shadowBlur=0;
+// Gorra (chico) o cola (chica)
+if(isBoy){
+cx.fillStyle='#111';
+cx.fillRect(p.x-headR*1.1,headY-headR*.8,headR*2.2,headR*.4);
+cx.fillRect(p.x-headR*.6,headY-headR*1.1,headR*1.2,headR*.5);
+}else{
+cx.fillStyle='#222';
+cx.beginPath();cx.moveTo(p.x,headY-headR);
+cx.quadraticCurveTo(p.x+headR*2,headY-headR*1.5,p.x+headR*1.5,headY+headR);
+cx.lineWidth=3*sc;cx.strokeStyle='#222';cx.stroke();
+}
+// Invencibilidad
+if(invincible>0){
+cx.strokeStyle=`rgba(0,255,0,${.3+Math.sin(Date.now()*.01)*.3})`;
+cx.lineWidth=3;
+cx.beginPath();cx.arc(p.x,p.y-bodyH/2,bodyW*1.5,0,Math.PI*2);cx.stroke();
+}
 }
 
-document.getElementById('claimDailyBtn').addEventListener('click', () => {
-    showRewardedAd(() => {
-        const reward = gameState.currentDay * 1000;
-        gameState.coins += reward;
-        gameState.currentDay++;
-        updateUI(); saveGameState();
-        audio.playCoinSound();
-        const tg = window.Telegram?.WebApp;
-        if (tg?.showAlert) tg.showAlert(`+${formatNumber(reward)} monedas!`);
-    });
+function drawObstacles(){
+obstacles.forEach(o=>{
+const oz=o.z-dist;
+if(oz<1||oz>120)return;
+const p=project(o.x,0,oz);
+const pTop=project(o.x,o.h,oz);
+const ow=o.w*p.s;
+const oh=p.y-pTop.y;
+if(ow<1)return;
+if(o.type==='train'){
+cx.fillStyle='#cc0000';
+cx.fillRect(p.x-ow/2,pTop.y,ow,oh);
+cx.fillStyle='#ff3333';
+cx.fillRect(p.x-ow/2+2,pTop.y+2,ow-4,oh*.3);
+cx.fillStyle='#ffff00';
+cx.fillRect(p.x-ow*.3,pTop.y+oh*.1,ow*.15,ow*.15);
+cx.fillRect(p.x+ow*.15,pTop.y+oh*.1,ow*.15,ow*.15);
+}else if(o.type==='pumpkin'){
+const r=ow/2;
+cx.fillStyle='#ff6b00';
+cx.beginPath();cx.arc(p.x,p.y-r,r,0,Math.PI*2);cx.fill();
+cx.fillStyle='#0f0';
+cx.shadowColor='#0f0';cx.shadowBlur=8;
+cx.beginPath();cx.arc(p.x-r*.3,p.y-r*1.1,r*.15,0,Math.PI*2);cx.fill();
+cx.beginPath();cx.arc(p.x+r*.3,p.y-r*1.1,r*.15,0,Math.PI*2);cx.fill();
+cx.shadowBlur=0;
+cx.fillStyle='#330';
+cx.fillRect(p.x-1,p.y-r*1.6,3,r*.4);
+}else{
+cx.fillStyle='#ff4444';
+cx.fillRect(p.x-ow/2,p.y-oh,ow,oh);
+cx.fillStyle='#ffff00';
+for(let i=0;i<3;i++)cx.fillRect(p.x-ow/2+i*ow/3,p.y-oh,ow/6,oh);
+}
 });
-
-document.getElementById('marathonBtn').addEventListener('click', () => {
-    if (gameState.videosWatchedToday >= 20) {
-        const tg = window.Telegram?.WebApp;
-        if (tg?.showAlert) tg.showAlert('Límite diario alcanzado');
-        return;
-    }
-    showRewardedAd(() => {
-        gameState.coins += 500;
-        gameState.videosWatchedToday++;
-        updateUI(); saveGameState();
-        audio.playCoinSound();
-    });
-});
-
-document.getElementById('inviteBtn').addEventListener('click', () => {
-    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'user';
-    const link = `https://t.me/YourBotName?start=ref_${userId}`;
-    navigator.clipboard?.writeText(link).then(() => {
-        const tg = window.Telegram?.WebApp;
-        if (tg?.showAlert) tg.showAlert('Link copiado');
-    }).catch(() => {
-        const tg = window.Telegram?.WebApp;
-        if (tg?.showAlert) tg.showAlert(`Link: ${link}`);
-    });
-});
-
-document.getElementById('loadSkillsBtn').addEventListener('click', () => {
-    showRewardedAd(() => {
-        gameState.skills.jetpack += 1;
-        gameState.skills.shield += 1;
-        gameState.skills.magnet += 1;
-        updateUI(); saveGameState();
-        audio.playJetpackSound();
-    });
-});
-
-// ============================================
-// WALLET
-// ============================================
-document.getElementById('saveWalletBtn').addEventListener('click', () => {
-    const addr = document.getElementById('walletAddress').value.trim();
-    if (addr) {
-        gameState.walletAddress = addr;
-        saveGameState();
-        const tg = window.Telegram?.WebApp;
-        if (tg?.showAlert) tg.showAlert('Wallet guardada');
-    }
-});
-
-document.querySelectorAll('.btn-withdraw').forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (!gameState.walletAddress) {
-            const tg = window.Telegram?.WebApp;
-            if (tg?.showAlert) tg.showAlert('Vincula tu wallet primero');
-            return;
-        }
-        const tg = window.Telegram?.WebApp;
-        if (tg?.showAlert) tg.showAlert(`Retiro de $${btn.dataset.amount} solicitado`);
-    });
-});
-
-// ============================================
-// JUEGO RUNNER
-// ============================================
-let canvas, ctx, player, obstacles, coins, gameLoop;
-let gameSpeed = 5;
-
-document.getElementById('startGameBtn').addEventListener('click', startGame);
-
-function startGame() {
-    audio.init();
-    gameState.isPlaying = true;
-    gameState.lives = 3;
-    gameState.currentCoins = 0;
-    document.querySelector('.game-menu').classList.add('hidden');
-    document.getElementById('gameCanvas').classList.remove('hidden');
-    document.getElementById('gameHUD').classList.remove('hidden');
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    player = {
-        x: canvas.width / 2 - 25, y: canvas.height - 150,
-        width: 50, height: 50, lane: 1, jumping: false, jumpHeight: 0
-    };
-    obstacles = []; coins = [];
-    gameSpeed = 5;
-    updateHUD();
-    gameLoop = setInterval(updateGame, 1000/60);
-    setupTouchControls();
 }
 
-function setupTouchControls() {
-    let touchStartX = 0;
-    canvas.ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
-    canvas.ontouchend = (e) => {
-        const diff = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0 && player.lane < 2) player.lane++;
-            else if (diff < 0 && player.lane > 0) player.lane--;
-        } else {
-            if (!player.jumping) {
-                player.jumping = true;
-                player.jumpHeight = 0;
-                audio.playJumpSound();
-            }
-        }
-    };
+function drawCoins(){
+coinArr.forEach(c=>{
+if(c.collected)return;
+const cz=c.z-dist;
+if(cz<1||cz>120)return;
+const floatY=c.y+Math.sin(Date.now()*.005+c.z)*.3;
+const p=project(c.x,floatY,cz);
+const r=Math.max(2,8*p.s);
+cx.fillStyle='#ffd700';
+cx.shadowColor='#ffd700';cx.shadowBlur=10;
+cx.beginPath();cx.arc(p.x,p.y,r,0,Math.PI*2);cx.fill();
+cx.shadowBlur=0;
+cx.fillStyle='#8b4513';
+cx.font=`bold ${Math.max(6,r)}px sans-serif`;
+cx.textAlign='center';cx.textBaseline='middle';
+cx.fillText('$',p.x,p.y);
+});
 }
 
-function updateGame() {
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const laneWidth = canvas.width / 3;
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
-    for (let i = 1; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(laneWidth * i, 0);
-        ctx.lineTo(laneWidth * i, canvas.height);
-        ctx.stroke();
-    }
-    player.x = laneWidth * player.lane + (laneWidth - player.width) / 2;
-    if (player.jumping) {
-        player.jumpHeight += 10;
-        if (player.jumpHeight >= 100) { player.jumping = false; player.jumpHeight = 0; }
-    }
-    const playerY = player.y - player.jumpHeight;
-    ctx.fillStyle = gameState.selectedCharacter === 'boy' ? '#00ff00' : '#8b00ff';
-    ctx.beginPath();
-    ctx.arc(player.x + player.width/2, playerY + player.height/2, player.width/2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(player.x + player.width/3, playerY + player.height/3, 5, 0, Math.PI*2);
-    ctx.arc(player.x + 2*player.width/3, playerY + player.height/3, 5, 0, Math.PI*2);
-    ctx.fill();
-    if (Math.random() < 0.02) {
-        const lane = Math.floor(Math.random() * 3);
-        obstacles.push({ x: laneWidth*lane + (laneWidth-50)/2, y: -50, width: 50, height: 50 });
-    }
-    if (Math.random() < 0.03) {
-        const lane = Math.floor(Math.random() * 3);
-        coins.push({ x: laneWidth*lane + (laneWidth-30)/2, y: -30, width: 30, height: 30 });
-    }
-    obstacles = obstacles.filter(obs => {
-        obs.y += gameSpeed;
-        ctx.fillStyle = '#ff6b00';
-        ctx.beginPath();
-        ctx.arc(obs.x + obs.width/2, obs.y + obs.height/2, obs.width/2, 0, Math.PI*2);
-        ctx.fill();
-        if (checkCollision(player, obs, playerY)) {
-            gameState.lives--;
-            updateHUD();
-            audio.playHitSound();
-            if (gameState.lives <= 0) endGame();
-            return false;
-        }
-        return obs.y < canvas.height;
-    });
-    coins = coins.filter(coin => {
-        coin.y += gameSpeed;
-        ctx.fillStyle = '#ffd700';
-        ctx.beginPath();
-        ctx.arc(coin.x + coin.width/2, coin.y + coin.height/2, coin.width/2, 0, Math.PI*2);
-        ctx.fill();
-        if (checkCollision(player, coin, playerY)) {
-            gameState.currentCoins += 10;
-            updateHUD();
-            audio.playCoinSound();
-            return false;
-        }
-        return coin.y < canvas.height;
-    });
-    gameSpeed += 0.001;
+function drawParticles(){
+particles.forEach(p=>{
+cx.globalAlpha=p.life;
+cx.fillStyle=p.color;
+cx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
+});
+cx.globalAlpha=1;
 }
 
-function checkCollision(o1, o2, pY) {
-    return o1.x < o2.x + o2.width && o1.x + o1.width > o2.x &&
-           pY < o2.y + o2.height && pY + o1.height > o2.y;
+function drawSpeedLines(){
+if(speed>8){
+const intensity=Math.min(1,(speed-8)/10);
+cx.strokeStyle=`rgba(255,107,0,${intensity*.3})`;
+cx.lineWidth=1;
+for(let i=0;i<8;i++){
+const sx=Math.random()*W;
+const sy=H*.3+Math.random()*H*.5;
+cx.beginPath();cx.moveTo(sx,sy);cx.lineTo(sx+(sx-W/2)*.1,sy+20+speed*2);cx.stroke();
+}
+}
 }
 
-function updateHUD() {
-    document.getElementById('hudCoins').textContent = gameState.currentCoins;
-    document.querySelectorAll('.heart').forEach((h, i) => {
-        h.textContent = i < gameState.lives ? '❤️' : '💔';
-    });
+function checkCollisions(){
+const pz=5;
+const px=pX;
+const py=pJump;
+obstacles.forEach(o=>{
+const oz=o.z-dist;
+if(o.passed||oz>7||oz<3)return;
+const dx=Math.abs(px-o.x);
+if(dx<1.2&&py<o.h*.7){
+if(invincible>0)return;
+o.passed=true;
+lives--;
+shakeT=15;
+au.hit();
+invincible=60;
+addParticles(W/2,H*.6,'#ff0000',15);
+updHUD();
+if(lives<=0)endGame();
+}
+});
+coinArr.forEach(c=>{
+if(c.collected)return;
+const cz=c.z-dist;
+if(cz>7||cz<3)return;
+const dx=Math.abs(px-c.x);
+const dy=Math.abs(py+1-c.y);
+if(dx<1.2&&dy<1.5){
+c.collected=true;
+rCoins+=10;
+au.coin();
+const p=project(c.x,c.y,cz);
+addParticles(p.x,p.y,'#ffd700',8);
+updHUD();
+}
+});
 }
 
-function endGame() {
-    clearInterval(gameLoop);
-    gameState.isPlaying = false;
-    document.getElementById('gameCanvas').classList.add('hidden');
-    document.getElementById('gameHUD').classList.add('hidden');
-    document.getElementById('gameOverScreen').classList.remove('hidden');
-    document.getElementById('finalCoins').textContent = gameState.currentCoins;
+function updHUD(){
+document.getElementById('hudCoins').textContent=rCoins+' 🪙';
+let h='';for(let i=0;i<3;i++)h+=i<lives?'❤️':'💔';
+document.getElementById('heartsD').textContent=h;
+document.getElementById('hudScore').textContent=Math.floor(dist)+'m';
 }
 
-document.getElementById('reviveBtn').addEventListener('click', () => {
-    showRewardedAd(() => {
-        gameState.lives = 3;
-        document.getElementById('gameOverScreen').classList.add('hidden');
-        document.getElementById('gameCanvas').classList.remove('hidden');
-        document.getElementById('gameHUD').classList.remove('hidden');
-        updateHUD();
-        gameLoop = setInterval(updateGame, 1000/60);
-    });
-});
-
-document.getElementById('doubleBtn').addEventListener('click', () => {
-    showRewardedAd(() => {
-        gameState.coins += gameState.currentCoins * 2;
-        updateUI(); saveGameState();
-        returnToMenu();
-        audio.playCoinSound();
-    });
-});
-
-document.getElementById('menuBtn').addEventListener('click', () => {
-    gameState.coins += gameState.currentCoins;
-    updateUI(); saveGameState();
-    returnToMenu();
-});
-
-function returnToMenu() {
-    document.getElementById('gameOverScreen').classList.add('hidden');
-    document.querySelector('.game-menu').classList.remove('hidden');
+function gameLoop(){
+if(!playing)return;
+animId=requestAnimationFrame(gameLoop);
+resize();
+dist+=speed*.05;
+speed=6+dist*.005;
+if(speed>18)speed=18;
+// Jump physics
+if(pJump>0||pJumpV>0){
+pJumpV-=.4;
+pJump+=pJumpV*.15;
+if(pJump<=0){pJump=0;pJumpV=0}
+}
+// Slide
+if(pSlideT>0){pSlideT--;pSlide=1}else pSlide=0;
+// Invincible
+if(invincible>0)invincible--;
+// Shake
+if(shakeT>0)shakeT--;
+// Spawn
+if(Math.random()<.015+dist*.00005)spawnObs();
+if(Math.random()<.02)spawnCoins();
+// Clean
+obstacles=obstacles.filter(o=>(o.z-dist)>-5);
+coinArr=coinArr.filter(c=>(c.z-dist)>-5&&!c.collected);
+// Particles
+particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.2;p.life-=.02});
+particles=particles.filter(p=>p.life>0);
+// Draw
+cx.save();
+if(shakeT>0)cx.translate((Math.random()-.5)*shakeT,(Math.random()-.5)*shakeT);
+drawSky();
+drawGround();
+drawBuildings();
+drawObstacles();
+drawCoins();
+drawPlayer();
+drawParticles();
+drawSpeedLines();
+cx.restore();
+checkCollisions();
+updHUD();
 }
 
-document.getElementById('pauseBtn').addEventListener('click', () => {
-    if (gameState.isPlaying) {
-        clearInterval(gameLoop);
-        gameState.isPlaying = false;
-    }
+function startGame(){
+au.init();
+playing=true;lives=3;rCoins=0;dist=0;speed=6;
+pLane=1;pTargetLane=1;pX=0;pJump=0;pJumpV=0;pSlide=0;pSlideT=0;
+obstacles=[];coinArr=[];particles=[];
+invincible=0;shakeT=0;
+initBuildings();
+document.getElementById('gameMenu').classList.add('hidden');
+cv.style.display='block';
+document.getElementById('gameHud').style.display='block';
+document.getElementById('hudBot').style.display='block';
+document.getElementById('goScreen').classList.remove('active');
+resize();
+updHUD();
+gameLoop();
+}
+
+function endGame(){
+playing=false;
+cancelAnimationFrame(animId);
+document.getElementById('finalC').textContent=rCoins;
+document.getElementById('finalD').textContent=Math.floor(dist);
+document.getElementById('goScreen').classList.add('active');
+}
+
+function returnMenu(){
+cv.style.display='none';
+document.getElementById('gameHud').style.display='none';
+document.getElementById('hudBot').style.display='none';
+document.getElementById('goScreen').classList.remove('active');
+document.getElementById('gameMenu').classList.remove('hidden');
+GS.coins+=rCoins;updUI();saveGS();
+}
+
+// Controls
+let touchSX=0,touchSY=0;
+cv.addEventListener('touchstart',e=>{touchSX=e.touches[0].clientX;touchSY=e.touches[0].clientY;e.preventDefault()},{passive:false});
+cv.addEventListener('touchend',e=>{
+const dx=e.changedTouches[0].clientX-touchSX;
+const dy=e.changedTouches[0].clientY-touchSY;
+if(Math.abs(dx)>Math.abs(dy)){
+if(dx>40&&pTargetLane<2){pTargetLane++;au.jump()}
+else if(dx<-40&&pTargetLane>0){pTargetLane--;au.jump()}
+}else{
+if(dy<-40&&pJump<=0){pJumpV=3.5;au.jump()}
+else if(dy>40&&pSlideT<=0){pSlideT=30}
+}
+e.preventDefault();
+},{passive:false});
+// Keyboard
+document.addEventListener('keydown',e=>{
+if(!playing)return;
+if(e.key==='ArrowLeft'&&pTargetLane>0)pTargetLane--;
+if(e.key==='ArrowRight'&&pTargetLane<2)pTargetLane++;
+if(e.key==='ArrowUp'&&pJump<=0){pJumpV=3.5;au.jump()}
+if(e.key==='ArrowDown'&&pSlideT<=0)pSlideT=30;
 });
 
-// ============================================
-// INICIALIZACIÓN
-// ============================================
-window.addEventListener('load', () => {
-    createCoinsRain();
-    loadGameState();
-    // Telegram WebApp
-    if (window.Telegram?.WebApp) {
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.setHeaderColor('#0a0a0a');
-        tg.setBackgroundColor('#0a0a0a');
-    }
-    // Transición de carga a start
-    setTimeout(showStartScreen, 2800);
-});
+document.getElementById('runBtn').onclick=startGame;
+document.getElementById('revBtn').onclick=()=>showAd(()=>{lives=3;document.getElementById('goScreen').classList.remove('active');playing=true;gameLoop()});
+document.getElementById('dblBtn').onclick=()=>showAd(()=>{rCoins*=2;au.coin();returnMenu()});
+document.getElementById('menuBtn').onclick=returnMenu;
+document.getElementById('pauseBtn').onclick=()=>{if(playing){playing=false;cancelAnimationFrame(animId)}};
 
-window.addEventListener('resize', () => {
-    if (canvas) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-});
+// Init
+loadGS();
+if(window.Telegram?.WebApp){const t=window.Telegram.WebApp;t.expand();t.setHeaderColor('#0a0a0a');t.setBackgroundColor('#0a0a0a')}
 </script>
 </body>
     </html>
