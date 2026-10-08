@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elegance Gamer - Runner Money</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* ============================================
+           RESET Y VARIABLES GLOBALES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-color: #ff6b00;
+            --secondary-color: #8b00ff;
+            --accent-color: #00ff00;
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a2e;
+            --text-light: #ffffff;
+            --text-dim: #aaaaaa;
+            --danger: #ff0000;
+            --success: #00ff00;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* ============================================
+           PANTALLA DE CARGA
+           ============================================ */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .game-logo {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .pumpkin {
+            display: inline-block;
+            color: var(--primary-color);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+
+        .loading-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            animation: loading 2s ease-in-out forwards;
+        }
+
+        @keyframes loading {
+            to { width: 100%; }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ============================================
+           CONTENEDOR PRINCIPAL
+           ============================================ */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: 0 2px 10px rgba(255, 107, 0, 0.3);
+        }
+
+        .logo-small {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .balance-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .coin-icon {
+            font-size: 28px;
+        }
+
+        /* ============================================
+           ÁREA DE CONTENIDO
+           ============================================ */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 140px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================
+           TARJETAS DE MISIÓN
+           ============================================ */
+        .mission-card {
+            background: var(--bg-card);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.2);
+        }
+
+        .mission-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .mission-card p {
+            margin-bottom: 10px;
+            color: var(--text-dim);
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .placeholder-text {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        /* ============================================
+           BOTONES
+           ============================================ */
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 15px;
+            background: #333;
+            border: 2px solid var(--text-dim);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           SELECTOR DE PERSONAJES
+           ============================================ */
+        .character-selector {
+            background: var(--bg-card);
+            border: 2px solid var(--secondary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .characters {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .character-card {
+            flex: 1;
+            background: #2a2a3e;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .character-card.selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .character-preview {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            background: #444;
+        }
+
+        .boy-skull {
+            background: linear-gradient(135deg, #00ff00, #00aa00);
+        }
+
+        .girl-skull {
+            background: linear-gradient(135deg, #8b00ff, #5500aa);
+        }
+
+        /* ============================================
+           TIENDA
+           ============================================ */
+        .shop-section {
+            background: var(--bg-card);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .shop-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .shop-item {
+            background: #2a2a3e;
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .shop-item:active {
+            transform: scale(0.95);
+        }
+
+        .shop-item.unlocked {
+            border-color: var(--accent-color);
+        }
+
+        /* ============================================
+           MENÚ DEL JUEGO
+           ============================================ */
+        .game-menu {
+            text-align: center;
+        }
+
+        .avatar-display {
+            margin: 30px 0;
+        }
+
+        .avatar-large {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
+        }
+
+        .graffiti-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+        }
+
+        .skills-section {
+            background: var(--bg-card);
+            border: 2px solid var(--secondary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .skills-inventory {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .skill-item {
+            background: #2a2a3e;
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 25px;
+            background: linear-gradient(135deg, #ff0000, #ff6b00);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        /* ============================================
+           CANVAS DEL JUEGO
+           ============================================ */
+        .game-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+        }
+
+        /* ============================================
+           HUD DEL JUEGO
+           ============================================ */
+        .game-hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .hearts {
+            font-size: 32px;
+        }
+
+        .hud-coins {
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .hud-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .btn-pause {
+            font-size: 32px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           GAME OVER
+           ============================================ */
+        .game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 102;
+        }
+
+        .game-over-screen h2 {
+            font-size: 48px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .game-over-screen p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .game-over-screen button {
+            width: 80%;
+            max-width: 300px;
+            margin: 10px 0;
+        }
+
+        /* ============================================
+           RANKING
+           ============================================ */
+        .player-stats {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .big-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 10px 0;
+        }
+
+        .leagues-list {
+            background: var(--bg-card);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .league-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            transition: background 0.3s;
+        }
+
+        .league-item:last-child {
+            border-bottom: none;
+        }
+
+        .league-item.current {
+            background: rgba(255, 107, 0, 0.2);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .league-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+
+        .league-name {
+            flex: 1;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .league-req {
+            font-size: 16px;
+            color: var(--text-dim);
+        }
+
+        /* ============================================
+           BILLETERA
+           ============================================ */
+        .wallet-info {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-address {
+            margin-top: 15px;
+        }
+
+        .wallet-address label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-dim);
+        }
+
+        .wallet-address input {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a3e;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .withdrawal-policy {
+            background: var(--bg-card);
+            border: 2px solid var(--secondary-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .policy-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-dim);
+        }
+
+        .withdrawal-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .btn-withdraw {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--success), #00aa00);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        /* ============================================
+           NAVEGACIÓN INFERIOR
+           ============================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background: var(--bg-card);
+            border-top: 2px solid var(--primary-color);
+            padding: 10px 0;
+            z-index: 50;
+        }
+
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 10px 5px;
+        }
+
+        .nav-btn.active {
+            color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .nav-btn.central {
+            transform: translateY(-15px);
+        }
+
+        .nav-btn.central.active {
+            transform: translateY(-20px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-text {
+            font-size: 12px;
+        }
+
+        /* ============================================
+           BANNER DE ANUNCIOS
+           ============================================ */
+        .banner-ad-space {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: #1a1a1a;
+            border-top: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 49;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 480px) {
+            .game-logo {
+                font-size: 36px;
+            }
+            
+            .characters {
+                flex-direction: column;
+            }
+            
+            .skills-inventory {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PANTALLA DE CARGA -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <h1 class="game-logo">RUNNER <span class="pumpkin">O</span>MONEY</h1>
+            <div class="loading-bar">
+                <div class="loading-fill"></div>
+            </div>
+            <p>Cargando Elegance Gamer...</p>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div id="mainContainer" class="main-container hidden">
+        <!-- HEADER CON SALDO -->
+        <header class="game-header">
+            <div class="logo-small">RUNNER <span class="pumpkin">O</span>MONEY</div>
+            <div class="balance-display">
+                <span id="coinBalance">0</span>
+                <span class="coin-icon">🪙</span>
+            </div>
+        </header>
+
+        <!-- ÁREA DE CONTENIDO DE LAS PESTAÑAS -->
+        <main class="content-area">
+            <!-- PESTAÑA 1: MISIONES -->
+            <section id="missionsTab" class="tab-content active">
+                <h2>🎯 Misiones y Tareas</h2>
+                
+                <div class="mission-card">
+                    <h3>📅 Recompensa Diaria</h3>
+                    <p>Día <span id="currentDay">1</span>: <span id="dailyReward">1,000</span> monedas</p>
+                    <button id="claimDailyBtn" class="btn-primary">Reclamar (Ver Video)</button>
+                </div>
+
+                <div class="mission-card">
+                    <h3>🎬 Maratón de Anuncios</h3>
+                    <p>Ve hasta 20 videos diarios</p>
+                    <p>Recompensa: 500 monedas por video</p>
+                    <button id="marathonBtn" class="btn-primary">Ver Video Ahora</button>
+                    <p class="small-text">Videos vistos hoy: <span id="videosWatched">0</span>/20</p>
+                </div>
+
+                <div class="mission-card">
+                    <h3>👥 Invitar Amigos</h3>
+                    <p>Gana 5,000 monedas por cada amigo</p>
+                    <button id="inviteBtn" class="btn-primary">Copiar Link de Referido</button>
+                </div>
+
+                <div class="mission-card">
+                    <h3>🔗 Tareas Externas</h3>
+                    <div id="offerwallContainer">
+                        <p class="placeholder-text">Contenedor para Monlix Offerwall</p>
+                    </div>
+                </div>
+
+                <div class="mission-card">
+                    <h3>📱 Tareas de Telegram</h3>
+                    <div id="telegramTasksContainer">
+                        <p class="placeholder-text">Contenedor para Tareas Nativas de Telegram</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 2: VESTIDOR -->
+            <section id="wardrobeTab" class="tab-content">
+                <h2>👗 Vestidor y Tienda</h2>
+                
+                <div class="character-selector">
+                    <h3>Selecciona Personaje</h3>
+                    <div class="characters">
+                        <div class="character-card selected" data-character="boy">
+                            <div class="character-preview boy-skull"></div>
+                            <p>Chico Calavera</p>
+                        </div>
+                        <div class="character-card" data-character="girl">
+                            <div class="character-preview girl-skull"></div>
+                            <p>Chica Calavera</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shop-section">
+                    <h3>👟 Calzado (10 videos)</h3>
+                    <div class="shop-items" id="shoesShop"></div>
+                </div>
+
+                <div class="shop-section">
+                    <h3>🧢 Gorras/Cascos (20 videos)</h3>
+                    <div class="shop-items" id="hatsShop"></div>
+                </div>
+
+                <div class="shop-section">
+                    <h3>👕 Camisetas (30 videos)</h3>
+                    <div class="shop-items" id="shirtsShop"></div>
+                </div>
+
+                <div class="shop-section">
+                    <h3>👖 Pantalones/Faldas (40 videos)</h3>
+                    <div class="shop-items" id="pantsShop"></div>
+                </div>
+
+                <div class="shop-section">
+                    <h3>🎭 Trajes Completos (50 videos)</h3>
+                    <div class="shop-items" id="fullOutfitsShop"></div>
+                </div>
+
+                <div class="shop-section">
+                    <h3>🛹 Tablas/Patinetas (50 videos)</h3>
+                    <div class="shop-items" id="boardsShop"></div>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 3: JUEGO (CENTRAL) -->
+            <section id="gameTab" class="tab-content">
+                <div class="game-menu">
+                    <div class="avatar-display">
+                        <div id="selectedAvatar" class="avatar-large boy-skull"></div>
+                        <p class="graffiti-text">EleganceCoin</p>
+                    </div>
+
+                    <div class="skills-section">
+                        <h3>🚀 Habilidades Pre-Carrera</h3>
+                        <p>Ver 1 video = 3 habilidades consumibles</p>
+                        <button id="loadSkillsBtn" class="btn-primary">Cargar Habilidades</button>
+                        <div class="skills-inventory">
+                            <div class="skill-item" data-skill="jetpack">🚀 Jetpack: <span>0</span></div>
+                            <div class="skill-item" data-skill="shield">🛹 Tabla: <span>0</span></div>
+                            <div class="skill-item" data-skill="magnet">🧲 Imán: <span>0</span></div>
+                            <div class="skill-item" data-skill="jump">⬆️ Super Salto: <span>0</span></div>
+                            <div class="skill-item" data-skill="speed">⚡ Velocidad: <span>0</span></div>
+                        </div>
+                    </div>
+
+                    <button id="startGameBtn" class="btn-start">¡CORRER!</button>
+                </div>
+
+                <!-- CANVAS DEL JUEGO -->
+                <canvas id="gameCanvas" class="game-canvas hidden"></canvas>
+                
+                <!-- HUD DEL JUEGO -->
+                <div id="gameHUD" class="game-hud hidden">
+                    <div class="hud-top">
+                        <div class="hearts">
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                        </div>
+                        <div class="hud-coins">
+                            <span id="hudCoins">0</span> 🪙
+                        </div>
+                    </div>
+                    <div class="hud-bottom">
+                        <button id="pauseBtn" class="btn-pause">⏸️</button>
+                    </div>
+                </div>
+
+                <!-- PANTALLA GAME OVER -->
+                <div id="gameOverScreen" class="game-over-screen hidden">
+                    <h2>💀 Game Over</h2>
+                    <p>Monedas ganadas: <span id="finalCoins">0</span></p>
+                    <button id="reviveBtn" class="btn-primary">Revivir (Ver Video)</button>
+                    <button id="doubleBtn" class="btn-primary">Multiplicar x2 (Ver Video)</button>
+                    <button id="menuBtn" class="btn-secondary">Volver al Menú</button>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 4: RANKING -->
+            <section id="rankingTab" class="tab-content">
+                <h2>🏆 Tabla de Clasificación</h2>
+                
+                <div class="player-stats">
+                    <h3>Tu Saldo Total</h3>
+                    <p class="big-number"><span id="totalBalance">0</span> monedas</p>
+                    <p>Liga Actual: <span id="currentLeague">Bronce</span></p>
+                </div>
+
+                <div class="leagues-list">
+                    <h3>Ligas</h3>
+                    <div class="league-item" data-league="bronze">
+                        <span class="league-icon">🥉</span>
+                        <span class="league-name">Bronce</span>
+                        <span class="league-req">500K</span>
+                    </div>
+                    <div class="league-item" data-league="silver">
+                        <span class="league-icon">🥈</span>
+                        <span class="league-name">Plata</span>
+                        <span class="league-req">1M</span>
+                    </div>
+                    <div class="league-item" data-league="gold">
+                        <span class="league-icon">🥇</span>
+                        <span class="league-name">Oro</span>
+                        <span class="league-req">5M</span>
+                    </div>
+                    <div class="league-item" data-league="diamond">
+                        <span class="league-icon">💎</span>
+                        <span class="league-name">Diamante</span>
+                        <span class="league-req">10M</span>
+                    </div>
+                    <div class="league-item" data-league="emerald">
+                        <span class="league-icon">💚</span>
+                        <span class="league-name">Esmeralda</span>
+                        <span class="league-req">20M</span>
+                    </div>
+                    <div class="league-item" data-league="ruby">
+                        <span class="league-icon">❤️</span>
+                        <span class="league-name">Rubí</span>
+                        <span class="league-req">35M</span>
+                    </div>
+                    <div class="league-item" data-league="sapphire">
+                        <span class="league-icon">💙</span>
+                        <span class="league-name">Zafiro</span>
+                        <span class="league-req">50M</span>
+                    </div>
+                    <div class="league-item" data-league="mythic">
+                        <span class="league-icon">🔮</span>
+                        <span class="league-name">Mítico</span>
+                        <span class="league-req">85M</span>
+                    </div>
+                    <div class="league-item" data-league="immortal">
+                        <span class="league-icon">👻</span>
+                        <span class="league-name">Inmortal</span>
+                        <span class="league-req">95M</span>
+                    </div>
+                    <div class="league-item" data-league="legendary">
+                        <span class="league-icon">🌟</span>
+                        <span class="league-name">Legendario</span>
+                        <span class="league-req">100M</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 5: BILLETERA -->
+            <section id="walletTab" class="tab-content">
+                <h2>💰 Billetera y Retiros</h2>
+                
+                <div class="wallet-info">
+                    <h3>Tu Billetera</h3>
+                    <div class="wallet-address">
+                        <label>Wallet Vinculada:</label>
+                        <input type="text" id="walletAddress" placeholder="Ingresa tu wallet USDT/TON">
+                        <button id="saveWalletBtn" class="btn-small">Guardar</button>
+                    </div>
+                </div>
+
+                <div class="withdrawal-policy">
+                    <h3>📋 Política de Retiros</h3>
+                    <p class="policy-text">
+                        Cada 40 días se realiza la evaluación de puntos acumulados en tu balance de EleganceCoin. 
+                        El reparto de dinero real en USDT se enviará directamente a tu Billetera de Telegram vinculada, 
+                        proporcional a tu actividad y puntuación. Entre más juegues y subas en la tabla, mayor será 
+                        tu recompensa en dólares reales. Sin inversiones, solo juega y gana.
+                    </p>
+                </div>
+
+                <div class="withdrawal-buttons">
+                    <h3>Retirar Fondos</h3>
+                    <button class="btn-withdraw" data-amount="1">$1.00 USD</button>
+                    <button class="btn-withdraw" data-amount="5">$5.00 USD</button>
+                    <button class="btn-withdraw" data-amount="10">$10.00 USD</button>
+                    <button class="btn-withdraw" data-amount="20">$20.00 USD</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-tab="missionsTab">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-text">Misiones</span>
+            </button>
+            <button class="nav-btn" data-tab="wardrobeTab">
+                <span class="nav-icon">👗</span>
+                <span class="nav-text">Vestidor</span>
+            </button>
+            <button class="nav-btn central" data-tab="gameTab">
+                <span class="nav-icon">🎮</span>
+                <span class="nav-text">Jugar</span>
+            </button>
+            <button class="nav-btn" data-tab="rankingTab">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-text">Ranking</span>
+            </button>
+            <button class="nav-btn" data-tab="walletTab">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">Wallet</span>
+            </button>
+        </nav>
+
+        <!-- ESPACIO PARA BANNER DE ANUNCIOS -->
+        <div id="bannerAdSpace" class="banner-ad-space">
+            <p class="placeholder-text">Espacio para Banner Ad (Adsgram/Monlix)</p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SISTEMA DE AUDIO - MÚSICA Y EFECTOS
+        // ============================================
+        class AudioManager {
+            constructor() {
+                this.audioContext = null;
+                this.backgroundMusic = null;
+                this.isMusicPlaying = false;
+                this.initAudioContext();
+            }
+
+            initAudioContext() {
+                // Crear contexto de audio al primer click
+                document.addEventListener('click', () => {
+                    if (!this.audioContext) {
+                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                }, { once: true });
+            }
+
+            // Generar música de fondo temática de Halloween
+            playBackgroundMusic() {
+                if (!this.audioContext || this.isMusicPlaying) return;
+
+                this.isMusicPlaying = true;
+                this.backgroundMusic = this.createHalloweenMusic();
+            }
+
+            createHalloweenMusic() {
+                const ctx = this.audioContext;
+                const now = ctx.currentTime;
+
+                // Melodía siniestra en loop
+                const playMelody = () => {
+                    if (!this.isMusicPlaying) return;
+
+                    // Notas de una escala menor (sonido tenebroso)
+                    const notes = [
+                        { freq: 220, duration: 0.5 }, // A3
+                        { freq: 246.94, duration: 0.5 }, // B3
+                        { freq: 261.63, duration: 0.5 }, // C4
+                        { freq: 293.66, duration: 0.5 }, // D4
+                        { freq: 329.63, duration: 0.5 }, // E4
+                        { freq: 349.23, duration: 0.5 }, // F4
+                        { freq: 392.00, duration: 0.5 }, // G4
+                        { freq: 440.00, duration: 0.5 }  // A4
+                    ];
+
+                    let time = now;
+                    notes.forEach(note => {
+                        const oscillator = ctx.createOscillator();
+                        const gainNode = ctx.createGain();
+
+                        oscillator.connect(gainNode);
+                        gainNode.connect(ctx.destination);
+
+                        oscillator.frequency.value = note.freq;
+                        oscillator.type = 'sine';
+
+                        gainNode.gain.setValueAtTime(0.05, time);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, time + note.duration);
+
+                        oscillator.start(time);
+                        oscillator.stop(time + note.duration);
+
+                        time += note.duration;
+                    });
+
+                    // Repetir cada 4 segundos
+                    setTimeout(playMelody, 4000);
+                };
+
+                playMelody();
+                return { stop: () => { this.isMusicPlaying = false; } };
+            }
+
+            stopBackgroundMusic() {
+                if (this.backgroundMusic) {
+                    this.backgroundMusic.stop();
+                    this.isMusicPlaying = false;
+                }
+            }
+
+            // Efecto de sonido: Moneda/Ding
+            playCoinSound() {
+                if (!this.audioContext) return;
+
+                const ctx = this.audioContext;
+                const now = ctx.currentTime;
+
+                // Sonido de moneda (ding agudo)
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.setValueAtTime(880, now); // A5
+                oscillator.frequency.exponentialRampToValueAtTime(1760, now + 0.1); // A6
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+                oscillator.start(now);
+                oscillator.stop(now + 0.2);
+            }
+
+            // Efecto de sonido: Colisión
+            playHitSound() {
+                if (!this.audioContext) return;
+
+                const ctx = this.audioContext;
+                const now = ctx.currentTime;
+
+                // Sonido de impacto (ruido grave)
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.setValueAtTime(100, now);
+                oscillator.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                oscillator.type = 'sawtooth';
+
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                oscillator.start(now);
+                oscillator.stop(now + 0.3);
+            }
+        }
+
+        const audioManager = new AudioManager();
+
+        // ============================================
+        // INICIALIZACIÓN DE TELEGRAM WEB APP
+        // ============================================
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.setHeaderColor('#0a0a0a');
+        tg.setBackgroundColor('#0a0a0a');
+
+        // ============================================
+        // ESTADO GLOBAL DEL JUEGO
+        // ============================================
+        const gameState = {
+            coins: 0,
+            selectedCharacter: 'boy',
+            currentDay: 1,
+            videosWatchedToday: 0,
+            skills: {
+                jetpack: 0,
+                shield: 0,
+                magnet: 0,
+                jump: 0,
+                speed: 0
+            },
+            unlockedItems: {
+                shoes: [],
+                hats: [],
+                shirts: [],
+                pants: [],
+                outfits: [],
+                boards: []
+            },
+            walletAddress: '',
+            isPlaying: false,
+            lives: 3,
+            currentCoins: 0
+        };
+
+        // ============================================
+        // FUNCIONES DE ESTADO
+        // ============================================
+        function loadGameState() {
+            const saved = localStorage.getItem('eleganceGamerState');
+            if (saved) {
+                Object.assign(gameState, JSON.parse(saved));
+                updateUI();
+            }
+        }
+
+        function saveGameState() {
+            localStorage.setItem('eleganceGamerState', JSON.stringify(gameState));
+        }
+
+        function updateUI() {
+            document.getElementById('coinBalance').textContent = formatNumber(gameState.coins);
+            document.getElementById('currentDay').textContent = gameState.currentDay;
+            document.getElementById('dailyReward').textContent = formatNumber(gameState.currentDay * 1000);
+            document.getElementById('videosWatched').textContent = gameState.videosWatchedToday;
+            document.getElementById('totalBalance').textContent = formatNumber(gameState.coins);
+            document.getElementById('walletAddress').value = gameState.walletAddress;
+            
+            Object.keys(gameState.skills).forEach(skill => {
+                const element = document.querySelector(`[data-skill="${skill}"] span`);
+                if (element) {
+                    element.textContent = gameState.skills[skill];
+                }
+            });
+            
+            updateCurrentLeague();
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function updateCurrentLeague() {
+            const leagues = [
+                { name: 'Bronce', req: 500000 },
+                { name: 'Plata', req: 1000000 },
+                { name: 'Oro', req: 5000000 },
+                { name: 'Diamante', req: 10000000 },
+                { name: 'Esmeralda', req: 20000000 },
+                { name: 'Rubí', req: 35000000 },
+                { name: 'Zafiro', req: 50000000 },
+                { name: 'Mítico', req: 85000000 },
+                { name: 'Inmortal', req: 95000000 },
+                { name: 'Legendario', req: 100000000 }
+            ];
+            
+            let currentLeague = 'Bronce';
+            for (let league of leagues) {
+                if (gameState.coins >= league.req) {
+                    currentLeague = league.name;
+                }
+            }
+            
+            document.getElementById('currentLeague').textContent = currentLeague;
+            
+            document.querySelectorAll('.league-item').forEach(item => {
+                item.classList.remove('current');
+                if (item.textContent.includes(currentLeague)) {
+                    item.classList.add('current');
+                }
+            });
+        }
+
+        // ============================================
+        // NAVEGACIÓN ENTRE PESTAÑAS
+        // ============================================
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                document.getElementById(tabId).classList.add('active');
+                
+                document.querySelectorAll('.nav-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+
+                // Iniciar música al entrar al juego
+                if (tabId === 'gameTab') {
+                    audioManager.playBackgroundMusic();
+                } else {
+                    audioManager.stopBackgroundMusic();
+                }
+            });
+        });
+
+        // ============================================
+        // SELECCIÓN DE PERSONAJE
+        // ============================================
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                gameState.selectedCharacter = card.dataset.character;
+                
+                const avatar = document.getElementById('selectedAvatar');
+                avatar.className = `avatar-large ${gameState.selectedCharacter}-skull`;
+                
+                saveGameState();
+            });
+        });
+
+        // ============================================
+        // MIS
